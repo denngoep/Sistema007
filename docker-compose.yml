@@ -1,0 +1,7 @@
+services:
+  sistema007:
+    build: .
+    container_name: sistema007_app
+    ports:
+      - "8081:80"
+    restart: always
