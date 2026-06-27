@@ -1,0 +1,32 @@
+name: Validar Sistema007
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validar-archivos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Validar index.html
+        run: test -f index.html
+
+      - name: Validar login.html
+        run: test -f login.html
+
+      - name: Validar CSS
+        run: test -f css/style.css
+
+      - name: Validar Dockerfile
+        run: test -f Dockerfile
+
+      - name: Validar Docker Compose
+        run: test -f docker-compose.yml
+
+      - name: Validar carpeta img
+        run: test -d img
