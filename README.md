@@ -1,65 +1,153 @@
 # Sistema007
 
-Sistema007 es una aplicación web orientada a la gestión farmacéitica.
-Su objetivo es apoyar procesos como el control de inventario, la dispensacióm de medicamentos y el seguimiento de pacientes.
+Sistema007 es una aplicación web orientada a la gestión farmacéutica. Su objetivo es optimizar los procesos de control de inventario, dispensación de medicamentos y seguimiento de pacientes, proporcionando una solución organizada, segura y eficiente para el personal farmacéutico.
+
+---
 
 ## Problema que resuelve
 
-En los procesos farmacéuticos pueden presentarse errores en registros manuales, falta de trazabilidad, dificultades en el control de inventario y demoras en la dispensación de medicamentos.
+En los procesos farmacéuticos aún existen actividades manuales que pueden generar:
 
-Sistema007 busca centralizar la información y facilitar una gestión más organizada, segura y eficiente.
+- Errores en la dispensación de medicamentos.
+- Falta de trazabilidad.
+- Dificultad para controlar el inventario.
+- Riesgo de vencimiento de medicamentos.
+- Demoras en la atención de pacientes.
+
+Sistema007 busca centralizar la información y automatizar estos procesos para mejorar la eficiencia y la seguridad.
+
+---
+
+## Objetivo
+
+Desarrollar una plataforma web que permita administrar los procesos farmacéuticos relacionados con:
+
+- Gestión de usuarios.
+- Control de inventario.
+- Dispensación de medicamentos.
+- Seguimiento de pacientes.
+- Reportes y trazabilidad.
+
+---
+
+## Usuarios del sistema
+
+- Regente de Farmacia
+- Químico Farmacéutico
+- Auxiliar de Farmacia
+- Administrador del sistema
+
+---
 
 ## Tecnologías utilizadas
 
--HTML
--CSS
--JavaScript
--Docker
--Docker Compose
--Nginx
--Git
--Github Actions
+- HTML5
+- CSS3
+- JavaScript
+- Docker
+- Docker Compose
+- Nginx
+- Git
+- GitHub
+- GitHub Actions
+
+---
 
 ## Estructura del proyecto
 
 ```text
-
-SISTEMA007/
+Sistema007/
+│
 ├── css/
 │   └── style.css
+│
 ├── img/
-│   ├── image.jpg
-│   └── Logo.jpg
+│   ├── Logo.jpg
+│   └── image.jpg
+│
 ├── index.html
 ├── login.html
 ├── Dockerfile
 ├── docker-compose.yml
-└── README.md
+├── README.md
+│
+└── .github/
+    └── workflows/
+        └── validar.yml
+```
 
-Ejecución con Docker
+## Implementación con Docker
 
-Para ejecutar el proyecto con docker
+El proyecto fue contenerizado utilizando Docker y Nginx como servidor web.
+
+Docker permite ejecutar Sistema007 dentro de un contenedor independiente del sistema operativo, facilitando el despliegue, la portabilidad y la configuración del entorno.
+
+Para iniciar la aplicación se utiliza Docker Compose.
+
+Construcción y ejecución:
+
 docker compose up -d --build
 
-Luego abrir en el navegador
-http://localhost:8080
+Detener los servicios:
 
-Verificación de contenedores
-docker ps
-
-Detener el proyecto
 docker compose down
 
-Implementación DevOps
-El proyecto fue contenerizado con Docker usando Nginx como servidor web.
-Docker Compose permite levantar el servicio de forma automática un solo comando.
+## Acceso al proyecto
 
-Además, el repositorio puede integrarse con Github Actions para validar archivos importantes del proyecto en cada actualización.
+Una vez iniciado el contenedor, la aplicación estará disponible en:
 
-Presentado por
-Dennis Gonzalez
-Tecnologia en Análisi y Desarrollo de Software.
-SENA
+http://localhost:8080
 
+## Comandos de verificación
 
-```
+Ver contenedores:
+
+docker ps
+
+Ver imágenes:
+
+docker images
+
+Ver redes:
+
+docker network ls
+
+Ver volúmenes:
+
+docker volume ls
+
+## Integración DevOps
+
+Sistema007 implementa principios básicos de DevOps mediante:
+
+Contenerización con Docker.
+Orquestación utilizando Docker Compose.
+Control de versiones con Git.
+Repositorio remoto en GitHub.
+Automatización de validaciones mediante GitHub Actions.
+
+Estas herramientas permiten facilitar el desarrollo colaborativo y garantizar que el proyecto pueda ejecutarse de manera consistente en diferentes equipos.
+
+## Demo
+
+GitHub Pages:
+
+https://denngoep.github.io/Sistema007/
+
+Repositorio GitHub:
+
+https://github.com/denngoep/Sistema007
+
+## Vista del proyecto
+
+![Sistema007](img/captura.png)
+
+## Autor
+
+Dennis González
+
+Tecnólogo en Análisis y Desarrollo de Software
+
+SENA – Centro de Tecnología y Manufactura Avanzada
+
+Proyecto académico Sistema007 – Gestión farmacéutica inteligente.
