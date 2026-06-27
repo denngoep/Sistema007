@@ -140,7 +140,7 @@ https://github.com/denngoep/Sistema007
 
 ## Vista del proyecto
 
-![Sistema007](img/captura.png)
+[Sistema007](img/captura.png)
 
 ## Autor
 
