@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #062b55, #0b4d8a);
+  min-height: 100vh;
+  color: white;
+}
+
+h1 {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+p {
+  margin: 0;
+}
+
+button:hover {
+  background-color: #0195a2;
+  transform: scale(1.05);
+}
