@@ -1,11 +1,11 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { UsersRepository } from '../repositories/users.repository';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   getUsers() {
     return {
@@ -14,35 +14,22 @@ export class UsersService {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    // Verifica si el correo ya está registrado
-    const existingUser = await this.prisma.usuario.findUnique({
-      where: {
-        correo: createUserDto.correo,
-      },
-    });
+    // Busca si el correo ya existe mediante la capa Repository
+    const existingUser = await this.usersRepository.findByEmail(
+      createUserDto.correo,
+    );
 
     if (existingUser) {
       throw new ConflictException('El correo ya se encuentra registrado');
     }
 
-    // Protege la contraseña antes de almacenarla
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    // Guarda el usuario en MySQL mediante Prisma
-    const user = await this.prisma.usuario.create({
-      data: {
-        nombre: createUserDto.nombre,
-        correo: createUserDto.correo,
-        password: hashedPassword,
-      },
-      select: {
-        id: true,
-        nombre: true,
-        correo: true,
-        activo: true,
-        createdAt: true,
-      },
-    });
+    const user = await this.usersRepository.create(
+      createUserDto.nombre,
+      createUserDto.correo,
+      hashedPassword,
+    );
 
     return {
       message: 'Usuario registrado correctamente',
