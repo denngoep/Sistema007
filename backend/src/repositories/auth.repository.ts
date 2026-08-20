@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+type CreateAuthUserParams = {
+  nombre: string;
+  correo: string;
+  password: string;
+};
+
 @Injectable()
-export class UsersRepository {
+export class AuthRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   findByEmail(correo: string) {
@@ -13,13 +19,9 @@ export class UsersRepository {
     });
   }
 
-  create(nombre: string, correo: string, password: string) {
+  createUser(data: CreateAuthUserParams) {
     return this.prisma.usuario.create({
-      data: {
-        nombre,
-        correo,
-        password,
-      },
+      data,
       select: {
         id: true,
         nombre: true,

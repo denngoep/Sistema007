@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UsersRepository } from '../repositories/users.repository';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +14,6 @@ export class UsersService {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    // Busca si el correo ya existe mediante la capa Repository
     const existingUser = await this.usersRepository.findByEmail(
       createUserDto.correo,
     );
