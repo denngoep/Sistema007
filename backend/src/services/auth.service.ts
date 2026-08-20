@@ -17,7 +17,9 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const existingUser = await this.authRepository.findByEmail(registerDto.email);
+    const existingUser = await this.authRepository.findByEmail(
+      registerDto.email,
+    );
 
     if (existingUser) {
       throw new ConflictException('El email ya se encuentra registrado');
@@ -44,13 +46,39 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales incorrectas');
     }
 
+    // Verifica si la cuenta ya se encuentra bloqueada.
+    if (!user.activo) {
+      throw new UnauthorizedException('Usuario bloqueado');
+    }
+
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
       user.password,
     );
 
+    // Si la contraseña es incorrecta, aumenta el contador.
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Credenciales incorrectas');
+      const updatedUser = await this.authRepository.incrementFailedAttempts(
+        user.id,
+      );
+
+      // Al llegar a 4 intentos fallidos, bloquea la cuenta.
+      if (updatedUser.intentosFallidos >= 4) {
+        await this.authRepository.blockUser(user.id);
+
+        throw new UnauthorizedException(
+          'Usuario bloqueado por superar el número máximo de intentos',
+        );
+      }
+
+      throw new UnauthorizedException(
+        `Credenciales incorrectas. Intento ${updatedUser.intentosFallidos} de 4`,
+      );
+    }
+
+    // Si inicia sesión correctamente, vuelve el contador a cero.
+    if (user.intentosFallidos > 0) {
+      await this.authRepository.resetFailedAttempts(user.id);
     }
 
     const payload = {

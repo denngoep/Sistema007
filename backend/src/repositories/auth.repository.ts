@@ -11,6 +11,7 @@ type CreateAuthUserParams = {
 export class AuthRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  // Busca un usuario por su correo
   findByEmail(correo: string) {
     return this.prisma.usuario.findUnique({
       where: {
@@ -19,6 +20,7 @@ export class AuthRepository {
     });
   }
 
+  // Crea un nuevo usuario
   createUser(data: CreateAuthUserParams) {
     return this.prisma.usuario.create({
       data,
@@ -28,6 +30,44 @@ export class AuthRepository {
         correo: true,
         activo: true,
         createdAt: true,
+      },
+    });
+  }
+
+  // Suma un intento fallido al usuario
+  incrementFailedAttempts(id: number) {
+    return this.prisma.usuario.update({
+      where: {
+        id,
+      },
+      data: {
+        intentosFallidos: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  // Reinicia los intentos fallidos después de un login correcto
+  resetFailedAttempts(id: number) {
+    return this.prisma.usuario.update({
+      where: {
+        id,
+      },
+      data: {
+        intentosFallidos: 0,
+      },
+    });
+  }
+
+  // Bloquea al usuario
+  blockUser(id: number) {
+    return this.prisma.usuario.update({
+      where: {
+        id,
+      },
+      data: {
+        activo: false,
       },
     });
   }
