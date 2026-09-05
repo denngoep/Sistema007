@@ -13,6 +13,23 @@ export class UsersRepository {
     });
   }
 
+  findAll() {
+    return this.prisma.usuario.findMany({
+      select: {
+        id: true,
+        nombre: true,
+        correo: true,
+        activo: true,
+        intentosFallidos: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        id: 'asc',
+      },
+    });
+  }
+
   create(nombre: string, correo: string, password: string) {
     return this.prisma.usuario.create({
       data: {

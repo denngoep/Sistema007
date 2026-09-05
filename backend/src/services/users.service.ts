@@ -8,9 +8,7 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   getUsers() {
-    return {
-      message: 'Módulo de usuarios de Sistema007 funcionando correctamente',
-    };
+    return this.usersRepository.findAll();
   }
 
   async createUser(createUserDto: CreateUserDto) {
