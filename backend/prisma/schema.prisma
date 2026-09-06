@@ -25,3 +25,19 @@ model Usuario {
 
   @@map("usuarios")
 }
+
+model Paciente {
+  id              Int      @id @default(autoincrement())
+  tipoDocumento   String
+  numeroDocumento String   @unique
+  nombres         String
+  apellidos       String
+  fechaNacimiento DateTime
+  telefono        String?
+  correo          String?
+  activo          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("pacientes")
+}

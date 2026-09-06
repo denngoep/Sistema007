@@ -30,6 +30,51 @@ export class UsersRepository {
     });
   }
 
+  update(
+    id: number,
+    data: {
+      nombre?: string;
+      correo?: string;
+      password?: string;
+    },
+  ) {
+    return this.prisma.usuario.update({
+      where: {
+        id,
+      },
+      data,
+      select: {
+        id: true,
+        nombre: true,
+        correo: true,
+        activo: true,
+        intentosFallidos: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  updateStatus(id: number, activo: boolean) {
+    return this.prisma.usuario.update({
+      where: {
+        id,
+      },
+      data: {
+        activo,
+      },
+      select: {
+        id: true,
+        nombre: true,
+        correo: true,
+        activo: true,
+        intentosFallidos: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
   create(nombre: string, correo: string, password: string) {
     return this.prisma.usuario.create({
       data: {
