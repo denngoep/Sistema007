@@ -4,6 +4,7 @@ import { UsersRepository } from '../repositories/users.repository';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateUserStatusDto } from '../dto/update-user-status.dto';
+import { RolUsuario } from '../generated/prisma/enums';
 
 @Injectable()
 export class UsersService {
@@ -28,9 +29,11 @@ export class UsersService {
       nombre?: string;
       correo?: string;
       password?: string;
+      rol?: RolUsuario;
     } = {
       nombre: updateUserDto.nombre,
       correo: updateUserDto.correo,
+      rol: updateUserDto.rol,
     };
 
     if (updateUserDto.password) {
@@ -74,6 +77,7 @@ export class UsersService {
       createUserDto.nombre,
       createUserDto.correo,
       hashedPassword,
+      createUserDto.rol,
     );
 
     return {

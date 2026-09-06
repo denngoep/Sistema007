@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
+import { RolUsuario } from '../generated/prisma/enums';
 
 @Injectable()
 export class UsersRepository {
@@ -19,6 +21,7 @@ export class UsersRepository {
         id: true,
         nombre: true,
         correo: true,
+        rol: true,
         activo: true,
         intentosFallidos: true,
         createdAt: true,
@@ -36,6 +39,7 @@ export class UsersRepository {
       nombre?: string;
       correo?: string;
       password?: string;
+      rol?: RolUsuario;
     },
   ) {
     return this.prisma.usuario.update({
@@ -47,6 +51,7 @@ export class UsersRepository {
         id: true,
         nombre: true,
         correo: true,
+        rol: true,
         activo: true,
         intentosFallidos: true,
         createdAt: true,
@@ -67,6 +72,7 @@ export class UsersRepository {
         id: true,
         nombre: true,
         correo: true,
+        rol: true,
         activo: true,
         intentosFallidos: true,
         createdAt: true,
@@ -75,17 +81,19 @@ export class UsersRepository {
     });
   }
 
-  create(nombre: string, correo: string, password: string) {
+  create(nombre: string, correo: string, password: string, rol: RolUsuario) {
     return this.prisma.usuario.create({
       data: {
         nombre,
         correo,
         password,
+        rol,
       },
       select: {
         id: true,
         nombre: true,
         correo: true,
+        rol: true,
         activo: true,
         createdAt: true,
       },
