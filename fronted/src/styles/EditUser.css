@@ -1,0 +1,177 @@
+.edit-user-page {
+  min-height: 100vh;
+  background: #f4f7fa;
+  color: #062b55;
+}
+
+.edit-user-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 48px;
+  background: #062b55;
+  color: #ffffff;
+}
+
+.edit-user-header h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.edit-user-header p {
+  margin: 7px 0 0;
+  color: #dbe8f3;
+}
+
+.edit-user-back {
+  padding: 11px 18px;
+  border: 1px solid #ffffff;
+  border-radius: 9px;
+  background: transparent;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-user-back:hover {
+  background: #ffffff;
+  color: #062b55;
+}
+
+.edit-user-content {
+  display: flex;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.edit-user-card {
+  width: 100%;
+  max-width: 620px;
+  padding: 34px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 7px 24px rgba(6, 43, 85, 0.09);
+}
+
+.edit-user-card-title {
+  margin-bottom: 30px;
+}
+
+.edit-user-card-title h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.edit-user-card-title p {
+  margin: 7px 0 0;
+  color: #66788a;
+}
+
+.edit-user-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.edit-user-field label {
+  margin-bottom: 8px;
+  color: #062b55;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.edit-user-field input,
+.edit-user-field select {
+  padding: 13px 14px;
+  border: 1px solid #d5dee7;
+  border-radius: 9px;
+  background: #ffffff;
+  outline: none;
+  font-size: 15px;
+  color: #33475b;
+}
+
+.edit-user-field input:focus,
+.edit-user-field select:focus {
+  border-color: #00aebc;
+  box-shadow: 0 0 0 3px rgba(0, 174, 188, 0.1);
+}
+
+.edit-user-success,
+.edit-user-error {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.edit-user-success {
+  background: #e6f7ef;
+  color: #1f7a4f;
+}
+
+.edit-user-error {
+  background: #fbeaea;
+  color: #a13535;
+}
+
+.edit-user-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.edit-user-actions button {
+  padding: 11px 18px;
+  border-radius: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-user-cancel {
+  border: 1px solid #d5dee7;
+  background: #ffffff;
+  color: #51606f;
+}
+
+.edit-user-cancel:hover {
+  background: #f4f7fa;
+}
+
+.edit-user-submit {
+  border: none;
+  background: #00aebc;
+  color: #ffffff;
+}
+
+.edit-user-submit:hover {
+  opacity: 0.9;
+}
+
+.edit-user-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 650px) {
+  .edit-user-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px;
+  }
+
+  .edit-user-card {
+    padding: 24px;
+  }
+
+  .edit-user-actions {
+    flex-direction: column-reverse;
+  }
+
+  .edit-user-actions button {
+    width: 100%;
+  }
+}

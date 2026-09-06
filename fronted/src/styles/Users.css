@@ -184,3 +184,14 @@
     padding: 28px 18px;
   }
 }
+
+.role-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e8f5f7;
+  color: #087b85;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}

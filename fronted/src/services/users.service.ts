@@ -31,6 +31,23 @@ export interface CreateUserResponse {
   user: User;
 }
 
+export interface UpdateUserRequest {
+  nombre?: string;
+  correo?: string;
+  password?: string;
+  rol?: UserRole;
+}
+
+export interface UpdateUserResponse {
+  message: string;
+  user: User;
+}
+
+export interface UpdateUserStatusResponse {
+  message: string;
+  user: User;
+}
+
 const API_URL = "http://localhost:3000";
 
 export async function getUsers(): Promise<User[]> {
@@ -61,6 +78,58 @@ export async function createUser(
       Array.isArray(data.message)
         ? data.message.join(", ")
         : data.message || "No fue posible registrar el usuario",
+    );
+  }
+
+  return data;
+}
+
+export async function updateUser(
+  id: number,
+  userData: UpdateUserRequest,
+): Promise<UpdateUserResponse> {
+  const response = await fetch(`${API_URL}/users/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      Array.isArray(data.message)
+        ? data.message.join(", ")
+        : data.message || "No fue posible actualizar el usuario",
+    );
+  }
+
+  return data;
+}
+
+export async function updateUserStatus(
+  id: number,
+  activo: boolean,
+): Promise<UpdateUserStatusResponse> {
+  const response = await fetch(`${API_URL}/users/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      activo,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      Array.isArray(data.message)
+        ? data.message.join(", ")
+        : data.message || "No fue posible actualizar el estado del usuario",
     );
   }
 
