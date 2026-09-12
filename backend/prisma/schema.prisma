@@ -39,17 +39,35 @@ model Usuario {
 }
 
 model Paciente {
-  id              Int      @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   tipoDocumento   String
-  numeroDocumento String   @unique
+  numeroDocumento String           @unique
   nombres         String
   apellidos       String
   fechaNacimiento DateTime
   telefono        String?
   correo          String?
-  activo          Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  activo          Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  historiaClinica HistoriaClinica?
 
   @@map("pacientes")
+}
+
+model HistoriaClinica {
+  id             Int      @id @default(autoincrement())
+  pacienteId     Int      @unique
+  grupoSanguineo String?
+  alergias       String?
+  antecedentes   String?
+  diagnosticos   String?
+  observaciones  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  paciente Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+
+  @@map("historias_clinicas")
 }
