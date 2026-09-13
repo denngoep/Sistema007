@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider     = "prisma-client"
   output       = "../src/generated/prisma"
@@ -24,6 +22,12 @@ enum RolUsuario {
   QUIMICO_FARMACEUTICO
 }
 
+enum EstadoFormulacion {
+  VIGENTE
+  VENCIDA
+  CANCELADA
+}
+
 model Usuario {
   id               Int        @id @default(autoincrement())
   nombre           String
@@ -35,21 +39,23 @@ model Usuario {
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
 
+  atencionesClinicas AtencionClinica[]
+
   @@map("usuarios")
 }
 
 model Paciente {
-  id              Int              @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   tipoDocumento   String
-  numeroDocumento String           @unique
+  numeroDocumento String   @unique
   nombres         String
   apellidos       String
   fechaNacimiento DateTime
   telefono        String?
   correo          String?
-  activo          Boolean          @default(true)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  activo          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   historiaClinica HistoriaClinica?
 
@@ -67,7 +73,63 @@ model HistoriaClinica {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  paciente Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  paciente   Paciente          @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  atenciones AtencionClinica[]
 
   @@map("historias_clinicas")
+}
+
+model AtencionClinica {
+  id                Int      @id @default(autoincrement())
+  historiaClinicaId Int
+  profesionalId     Int
+  numeroIngreso     String   @unique
+  fechaAtencion     DateTime @default(now())
+  motivoConsulta    String?
+  evolucion         String?
+  diagnostico       String?
+  observaciones     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  historiaClinica HistoriaClinica @relation(fields: [historiaClinicaId], references: [id], onDelete: Cascade)
+  profesional     Usuario         @relation(fields: [profesionalId], references: [id])
+
+  formulaciones Formulacion[]
+
+  @@map("atenciones_clinicas")
+}
+
+model Formulacion {
+  id                Int               @id @default(autoincrement())
+  atencionClinicaId Int
+  fechaFormulacion  DateTime          @default(now())
+  vigenciaMeses     Int               @default(1)
+  indicaciones      String?
+  estado            EstadoFormulacion @default(VIGENTE)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  atencionClinica AtencionClinica      @relation(fields: [atencionClinicaId], references: [id], onDelete: Cascade)
+  medicamentos    DetalleFormulacion[]
+
+  @@map("formulaciones")
+}
+
+model DetalleFormulacion {
+  id                Int     @id @default(autoincrement())
+  formulacionId     Int
+  medicamento       String
+  concentracion     String?
+  formaFarmaceutica String?
+  dosis             String
+  frecuencia        String
+  duracion          String?
+  cantidad          Int
+  viaAdministracion String?
+  observaciones     String?
+
+  formulacion Formulacion @relation(fields: [formulacionId], references: [id], onDelete: Cascade)
+
+  @@map("detalles_formulacion")
 }

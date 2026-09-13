@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { PatientsModule } from './patients/patients.module';
 import { ClinicalHistoryModule } from './clinical-history/clinical-history.module';
+import { FormulationsModule } from './formulations/formulations.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ClinicalHistoryModule } from './clinical-history/clinical-history.modul
     PrismaModule,
     PatientsModule,
     ClinicalHistoryModule,
+    FormulationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
