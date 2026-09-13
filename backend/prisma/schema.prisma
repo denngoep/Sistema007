@@ -41,6 +41,23 @@ enum EstadoEsquemaTratamiento {
   FINALIZADO
 }
 
+enum EstadoProductoInventario {
+  ACTIVO
+  INACTIVO
+}
+
+enum EstadoLoteInventario {
+  DISPONIBLE
+  AGOTADO
+  VENCIDO
+  BLOQUEADO
+}
+
+enum TipoProductoInventario {
+  MEDICAMENTO
+  INSUMO
+}
+
 model Usuario {
   id               Int        @id @default(autoincrement())
   nombre           String
@@ -206,4 +223,55 @@ model DetalleFormulacion {
   formulacion Formulacion @relation(fields: [formulacionId], references: [id], onDelete: Cascade)
 
   @@map("detalles_formulacion")
+}
+
+model Medicamento {
+  id                Int      @id @default(autoincrement())
+  nombre            String
+  concentracion     String
+  formaFarmaceutica String
+  viaAdministracion String?
+  activo            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  productos ProductoInventario[]
+
+  @@unique([nombre, concentracion, formaFarmaceutica])
+  @@map("medicamentos")
+}
+
+model ProductoInventario {
+  id             Int                      @id @default(autoincrement())
+  medicamentoId  Int?
+  codigoInterno  Int?                     @unique
+  tipo           TipoProductoInventario
+  descripcion    String
+  marca          String?
+  laboratorio    String?
+  registroInvima String?
+  estado         EstadoProductoInventario @default(ACTIVO)
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+
+  medicamento Medicamento?     @relation(fields: [medicamentoId], references: [id])
+  lotes       LoteInventario[]
+
+  @@map("productos_inventario")
+}
+
+model LoteInventario {
+  id                   Int                  @id @default(autoincrement())
+  productoInventarioId Int
+  numeroLote           String
+  fechaVencimiento     DateTime
+  cantidad             Int                  @default(0)
+  estado               EstadoLoteInventario @default(DISPONIBLE)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  productoInventario ProductoInventario @relation(fields: [productoInventarioId], references: [id], onDelete: Cascade)
+
+  @@unique([productoInventarioId, numeroLote])
+  @@map("lotes_inventario")
 }
