@@ -33,10 +33,33 @@ export class FormulationsRepository {
     });
   }
 
+  findDiagnosisById(diagnosticoPacienteId: number) {
+    return this.prisma.diagnosticoPaciente.findUnique({
+      where: {
+        id: diagnosticoPacienteId,
+      },
+      include: {
+        esquemas: {
+          where: {
+            estado: 'ACTIVO',
+          },
+          orderBy: {
+            fechaInicio: 'desc',
+          },
+          take: 1,
+          include: {
+            medicamentos: true,
+          },
+        },
+      },
+    });
+  }
+
   create(createFormulationDto: CreateFormulationDto) {
     return this.prisma.formulacion.create({
       data: {
         atencionClinicaId: createFormulationDto.atencionClinicaId,
+        diagnosticoPacienteId: createFormulationDto.diagnosticoPacienteId,
         vigenciaMeses: createFormulationDto.vigenciaMeses,
         indicaciones: createFormulationDto.indicaciones,
         medicamentos: {
@@ -70,6 +93,16 @@ export class FormulationsRepository {
                 activo: true,
               },
             },
+          },
+        },
+        diagnosticoPaciente: {
+          select: {
+            id: true,
+            nombre: true,
+            codigoCie10: true,
+            tipo: true,
+            requiereEsquema: true,
+            activo: true,
           },
         },
         medicamentos: true,

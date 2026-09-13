@@ -54,6 +54,11 @@ export class CreateFormulationDto {
 
   @IsInt()
   @Min(1)
+  @IsOptional()
+  diagnosticoPacienteId?: number;
+
+  @IsInt()
+  @Min(1)
   vigenciaMeses!: number;
 
   @IsString()

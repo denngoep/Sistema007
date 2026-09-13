@@ -28,6 +28,19 @@ enum EstadoFormulacion {
   CANCELADA
 }
 
+enum TipoDiagnostico {
+  AGUDO
+  CRONICO
+  OTRO
+}
+
+enum EstadoEsquemaTratamiento {
+  ACTIVO
+  INACTIVO
+  SUSPENDIDO
+  FINALIZADO
+}
+
 model Usuario {
   id               Int        @id @default(autoincrement())
   nombre           String
@@ -73,8 +86,9 @@ model HistoriaClinica {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  paciente   Paciente          @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
-  atenciones AtencionClinica[]
+  paciente             Paciente              @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  atenciones           AtencionClinica[]
+  diagnosticosPaciente DiagnosticoPaciente[]
 
   @@map("historias_clinicas")
 }
@@ -95,23 +109,83 @@ model AtencionClinica {
   historiaClinica HistoriaClinica @relation(fields: [historiaClinicaId], references: [id], onDelete: Cascade)
   profesional     Usuario         @relation(fields: [profesionalId], references: [id])
 
-  formulaciones Formulacion[]
+  formulaciones        Formulacion[]
+  diagnosticosPaciente DiagnosticoPaciente[]
 
   @@map("atenciones_clinicas")
 }
 
-model Formulacion {
-  id                Int               @id @default(autoincrement())
-  atencionClinicaId Int
-  fechaFormulacion  DateTime          @default(now())
-  vigenciaMeses     Int               @default(1)
-  indicaciones      String?
-  estado            EstadoFormulacion @default(VIGENTE)
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+model DiagnosticoPaciente {
+  id                Int             @id @default(autoincrement())
+  historiaClinicaId Int
+  atencionClinicaId Int?
+  nombre            String
+  codigoCie10       String?
+  tipo              TipoDiagnostico
+  requiereEsquema   Boolean         @default(false)
+  fechaDiagnostico  DateTime        @default(now())
+  activo            Boolean         @default(true)
+  observaciones     String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
-  atencionClinica AtencionClinica      @relation(fields: [atencionClinicaId], references: [id], onDelete: Cascade)
-  medicamentos    DetalleFormulacion[]
+  historiaClinica HistoriaClinica  @relation(fields: [historiaClinicaId], references: [id], onDelete: Cascade)
+  atencionClinica AtencionClinica? @relation(fields: [atencionClinicaId], references: [id])
+
+  esquemas      EsquemaTratamiento[]
+  formulaciones Formulacion[]
+
+  @@map("diagnosticos_paciente")
+}
+
+model EsquemaTratamiento {
+  id                    Int                      @id @default(autoincrement())
+  diagnosticoPacienteId Int
+  fechaInicio           DateTime                 @default(now())
+  fechaFin              DateTime?
+  estado                EstadoEsquemaTratamiento @default(ACTIVO)
+  observaciones         String?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+
+  diagnosticoPaciente DiagnosticoPaciente @relation(fields: [diagnosticoPacienteId], references: [id], onDelete: Cascade)
+
+  medicamentos DetalleEsquemaTratamiento[]
+
+  @@map("esquemas_tratamiento")
+}
+
+model DetalleEsquemaTratamiento {
+  id                Int     @id @default(autoincrement())
+  esquemaId         Int
+  medicamento       String
+  concentracion     String?
+  formaFarmaceutica String?
+  dosis             String
+  frecuencia        String
+  viaAdministracion String?
+  observaciones     String?
+
+  esquema EsquemaTratamiento @relation(fields: [esquemaId], references: [id], onDelete: Cascade)
+
+  @@map("detalles_esquema_tratamiento")
+}
+
+model Formulacion {
+  id                    Int               @id @default(autoincrement())
+  atencionClinicaId     Int
+  diagnosticoPacienteId Int?
+  fechaFormulacion      DateTime          @default(now())
+  vigenciaMeses         Int               @default(1)
+  indicaciones          String?
+  estado                EstadoFormulacion @default(VIGENTE)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  atencionClinica     AtencionClinica      @relation(fields: [atencionClinicaId], references: [id], onDelete: Cascade)
+  diagnosticoPaciente DiagnosticoPaciente? @relation(fields: [diagnosticoPacienteId], references: [id])
+
+  medicamentos DetalleFormulacion[]
 
   @@map("formulaciones")
 }
