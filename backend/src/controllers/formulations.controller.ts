@@ -1,4 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 
 import { CreateFormulationDto } from '../dto/create-formulation.dto';
 import { FormulationsService } from '../services/formulations.service';
@@ -10,5 +17,12 @@ export class FormulationsController {
   @Post()
   createFormulation(@Body() createFormulationDto: CreateFormulationDto) {
     return this.formulationsService.createFormulation(createFormulationDto);
+  }
+
+  @Get('patient/:patientId/active')
+  getActiveFormulationsByPatient(
+    @Param('patientId', ParseIntPipe) patientId: number,
+  ) {
+    return this.formulationsService.getActiveFormulationsByPatient(patientId);
   }
 }

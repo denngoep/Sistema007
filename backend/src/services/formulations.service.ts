@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 import {
   BadRequestException,
@@ -77,5 +78,42 @@ export class FormulationsService {
     }
 
     return this.formulationsRepository.create(createFormulationDto);
+  }
+
+  async getActiveFormulationsByPatient(patientId: number) {
+    const patient =
+      await this.formulationsRepository.findPatientById(patientId);
+
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrado');
+    }
+
+    const formulations =
+      await this.formulationsRepository.findActiveFormulationsByPatient(
+        patientId,
+      );
+
+    const now = new Date();
+
+    const activeFormulations = formulations
+      .map((formulation) => {
+        const expirationDate = new Date(formulation.fechaFormulacion);
+
+        expirationDate.setMonth(
+          expirationDate.getMonth() + formulation.vigenciaMeses,
+        );
+
+        return {
+          ...formulation,
+          fechaVencimiento: expirationDate,
+        };
+      })
+      .filter((formulation) => formulation.fechaVencimiento >= now);
+
+    return {
+      paciente: patient,
+      totalFormulacionesVigentes: activeFormulations.length,
+      formulaciones: activeFormulations,
+    };
   }
 }

@@ -55,6 +55,64 @@ export class FormulationsRepository {
     });
   }
 
+  findPatientById(patientId: number) {
+    return this.prisma.paciente.findUnique({
+      where: {
+        id: patientId,
+      },
+      select: {
+        id: true,
+        tipoDocumento: true,
+        numeroDocumento: true,
+        nombres: true,
+        apellidos: true,
+        activo: true,
+      },
+    });
+  }
+
+  findActiveFormulationsByPatient(patientId: number) {
+    return this.prisma.formulacion.findMany({
+      where: {
+        estado: 'VIGENTE',
+        atencionClinica: {
+          historiaClinica: {
+            pacienteId: patientId,
+          },
+        },
+      },
+      orderBy: {
+        fechaFormulacion: 'desc',
+      },
+      include: {
+        diagnosticoPaciente: {
+          select: {
+            id: true,
+            nombre: true,
+            codigoCie10: true,
+            tipo: true,
+            requiereEsquema: true,
+          },
+        },
+        medicamentos: true,
+        atencionClinica: {
+          select: {
+            id: true,
+            numeroIngreso: true,
+            fechaAtencion: true,
+            profesional: {
+              select: {
+                id: true,
+                nombre: true,
+                rol: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   create(createFormulationDto: CreateFormulationDto) {
     return this.prisma.formulacion.create({
       data: {
