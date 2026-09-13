@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 
 import { CreateInventoryProductDto } from '../dto/create-inventory-product.dto';
 import { InventoryService } from '../services/inventory.service';
@@ -10,5 +10,10 @@ export class InventoryController {
   @Post('products')
   createProduct(@Body() createInventoryProductDto: CreateInventoryProductDto) {
     return this.inventoryService.createProduct(createInventoryProductDto);
+  }
+
+  @Get('products')
+  getAllProducts() {
+    return this.inventoryService.getAllProducts();
   }
 }

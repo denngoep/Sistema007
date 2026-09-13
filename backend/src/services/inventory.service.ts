@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import {
   BadRequestException,
   ConflictException,
@@ -82,5 +78,14 @@ export class InventoryService {
         cantidad: createInventoryProductDto.lote.cantidad,
       },
     });
+  }
+
+  async getAllProducts() {
+    const products = await this.inventoryRepository.findAllProducts();
+
+    return {
+      totalProductos: products.length,
+      productos: products,
+    };
   }
 }

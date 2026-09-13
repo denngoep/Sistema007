@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -53,6 +50,22 @@ export class InventoryRepository {
     return this.prisma.productoInventario.findUnique({
       where: {
         codigoInterno,
+      },
+    });
+  }
+
+  findAllProducts() {
+    return this.prisma.productoInventario.findMany({
+      orderBy: {
+        codigoInterno: 'asc',
+      },
+      include: {
+        medicamento: true,
+        lotes: {
+          orderBy: {
+            fechaVencimiento: 'asc',
+          },
+        },
       },
     });
   }
