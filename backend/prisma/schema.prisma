@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider     = "prisma-client"
   output       = "../src/generated/prisma"
@@ -58,6 +55,27 @@ enum TipoProductoInventario {
   INSUMO
 }
 
+enum EstadoActaRecepcion {
+  BORRADOR
+  PENDIENTE_REVISION
+  APROBADA
+  RECHAZADA
+  ANULADA
+}
+
+enum EstadoIngresoInventario {
+  BORRADOR
+  CONFIRMADO
+  ANULADO
+}
+
+enum TipoMovimientoInventario {
+  INGRESO
+  TRASLADO
+  AJUSTE_ENTRADA
+  AJUSTE_SALIDA
+}
+
 model Usuario {
   id               Int        @id @default(autoincrement())
   nombre           String
@@ -70,6 +88,15 @@ model Usuario {
   updatedAt        DateTime   @updatedAt
 
   atencionesClinicas AtencionClinica[]
+
+  bodegasCreadas Bodega[] @relation("BodegaCreadaPor")
+
+  actasRecepcionElaboradas ActaRecepcion[] @relation("ActaElaboradaPor")
+  actasRecepcionRevisadas  ActaRecepcion[] @relation("ActaRevisadaPor")
+
+  ingresosInventario IngresoInventario[] @relation("IngresoConfirmadoPor")
+
+  movimientosInventario MovimientoInventario[]
 
   @@map("usuarios")
 }
@@ -103,8 +130,10 @@ model HistoriaClinica {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  paciente             Paciente              @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
-  atenciones           AtencionClinica[]
+  paciente Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+
+  atenciones AtencionClinica[]
+
   diagnosticosPaciente DiagnosticoPaciente[]
 
   @@map("historias_clinicas")
@@ -124,9 +153,11 @@ model AtencionClinica {
   updatedAt         DateTime @updatedAt
 
   historiaClinica HistoriaClinica @relation(fields: [historiaClinicaId], references: [id], onDelete: Cascade)
-  profesional     Usuario         @relation(fields: [profesionalId], references: [id])
 
-  formulaciones        Formulacion[]
+  profesional Usuario @relation(fields: [profesionalId], references: [id])
+
+  formulaciones Formulacion[]
+
   diagnosticosPaciente DiagnosticoPaciente[]
 
   @@map("atenciones_clinicas")
@@ -146,10 +177,12 @@ model DiagnosticoPaciente {
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
-  historiaClinica HistoriaClinica  @relation(fields: [historiaClinicaId], references: [id], onDelete: Cascade)
+  historiaClinica HistoriaClinica @relation(fields: [historiaClinicaId], references: [id], onDelete: Cascade)
+
   atencionClinica AtencionClinica? @relation(fields: [atencionClinicaId], references: [id])
 
-  esquemas      EsquemaTratamiento[]
+  esquemas EsquemaTratamiento[]
+
   formulaciones Formulacion[]
 
   @@map("diagnosticos_paciente")
@@ -199,7 +232,8 @@ model Formulacion {
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
 
-  atencionClinica     AtencionClinica      @relation(fields: [atencionClinicaId], references: [id], onDelete: Cascade)
+  atencionClinica AtencionClinica @relation(fields: [atencionClinicaId], references: [id], onDelete: Cascade)
+
   diagnosticoPaciente DiagnosticoPaciente? @relation(fields: [diagnosticoPacienteId], references: [id])
 
   medicamentos DetalleFormulacion[]
@@ -245,6 +279,7 @@ model ProductoInventario {
   id             Int                      @id @default(autoincrement())
   medicamentoId  Int?
   codigoInterno  Int?                     @unique
+  codigoBarras   String?                  @unique
   tipo           TipoProductoInventario
   descripcion    String
   marca          String?
@@ -254,24 +289,259 @@ model ProductoInventario {
   createdAt      DateTime                 @default(now())
   updatedAt      DateTime                 @updatedAt
 
-  medicamento Medicamento?     @relation(fields: [medicamentoId], references: [id])
-  lotes       LoteInventario[]
+  medicamento Medicamento? @relation(fields: [medicamentoId], references: [id])
+
+  lotes LoteInventario[]
+
+  detallesActaRecepcion DetalleActaRecepcion[]
 
   @@map("productos_inventario")
 }
 
 model LoteInventario {
-  id                   Int                  @id @default(autoincrement())
+  id                   Int      @id @default(autoincrement())
   productoInventarioId Int
   numeroLote           String
   fechaVencimiento     DateTime
-  cantidad             Int                  @default(0)
-  estado               EstadoLoteInventario @default(DISPONIBLE)
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+
+  // Temporal: HU-017 y HU-018 todavía utilizan este campo.
+  // El stock definitivo será controlado por ExistenciaInventario.
+  cantidad Int @default(0)
+
+  estado    EstadoLoteInventario @default(DISPONIBLE)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
 
   productoInventario ProductoInventario @relation(fields: [productoInventarioId], references: [id], onDelete: Cascade)
 
+  existencias ExistenciaInventario[]
+
+  detallesIngreso DetalleIngresoInventario[]
+
+  movimientos MovimientoInventario[]
+
   @@unique([productoInventarioId, numeroLote])
   @@map("lotes_inventario")
+}
+
+model Sede {
+  id        Int      @id @default(autoincrement())
+  codigo    String   @unique
+  nombre    String
+  direccion String?
+  ciudad    String?
+  telefono  String?
+  activa    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bodegas Bodega[]
+
+  actasRecepcion ActaRecepcion[]
+
+  @@map("sedes")
+}
+
+model Bodega {
+  id                  Int      @id @default(autoincrement())
+  sedeId              Int
+  nombre              String
+  descripcion         String?
+  permiteDispensacion Boolean  @default(false)
+  activa              Boolean  @default(true)
+  creadoPorId         Int?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  sede Sede @relation(fields: [sedeId], references: [id])
+
+  creadoPor Usuario? @relation("BodegaCreadaPor", fields: [creadoPorId], references: [id])
+
+  existencias ExistenciaInventario[]
+
+  ingresosDestino IngresoInventario[]
+
+  movimientosOrigen MovimientoInventario[] @relation("MovimientoBodegaOrigen")
+
+  movimientosDestino MovimientoInventario[] @relation("MovimientoBodegaDestino")
+
+  @@unique([sedeId, nombre])
+  @@index([sedeId])
+  @@map("bodegas")
+}
+
+model Proveedor {
+  id              Int      @id @default(autoincrement())
+  nit             String   @unique
+  razonSocial     String
+  nombreComercial String?
+  telefono        String?
+  correo          String?
+  direccion       String?
+  contacto        String?
+  activo          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  actasRecepcion ActaRecepcion[]
+
+  @@map("proveedores")
+}
+
+model ActaRecepcion {
+  id                Int                 @id @default(autoincrement())
+  numeroActa        String              @unique
+  sedeId            Int
+  proveedorId       Int
+  elaboradoPorId    Int
+  revisadoPorId     Int?
+  numeroFactura     String?
+  numeroOrdenCompra String?
+  numeroRemision    String?
+  fechaFactura      DateTime?
+  fechaRecepcion    DateTime            @default(now())
+  estado            EstadoActaRecepcion @default(BORRADOR)
+  observaciones     String?
+  fechaRevision     DateTime?
+  motivoRechazo     String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  sede Sede @relation(fields: [sedeId], references: [id])
+
+  proveedor Proveedor @relation(fields: [proveedorId], references: [id])
+
+  elaboradoPor Usuario @relation("ActaElaboradaPor", fields: [elaboradoPorId], references: [id])
+
+  revisadoPor Usuario? @relation("ActaRevisadaPor", fields: [revisadoPorId], references: [id])
+
+  detalles DetalleActaRecepcion[]
+
+  ingresoInventario IngresoInventario?
+
+  @@index([sedeId])
+  @@index([proveedorId])
+  @@index([elaboradoPorId])
+  @@index([revisadoPorId])
+  @@map("actas_recepcion")
+}
+
+model DetalleActaRecepcion {
+  id               Int      @id @default(autoincrement())
+  actaRecepcionId  Int
+  productoId       Int
+  numeroLote       String
+  fechaVencimiento DateTime
+  cantidadRecibida Int
+  registroInvima   String?
+  observaciones    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  actaRecepcion ActaRecepcion @relation(fields: [actaRecepcionId], references: [id], onDelete: Cascade)
+
+  producto ProductoInventario @relation(fields: [productoId], references: [id])
+
+  detalleIngreso DetalleIngresoInventario?
+
+  @@index([actaRecepcionId])
+  @@index([productoId])
+  @@map("detalles_acta_recepcion")
+}
+
+model IngresoInventario {
+  id              Int                     @id @default(autoincrement())
+  numeroIngreso   String                  @unique
+  actaRecepcionId Int                     @unique
+  bodegaDestinoId Int
+  confirmadoPorId Int
+  fechaIngreso    DateTime                @default(now())
+  estado          EstadoIngresoInventario @default(BORRADOR)
+  observaciones   String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  actaRecepcion ActaRecepcion @relation(fields: [actaRecepcionId], references: [id])
+
+  bodegaDestino Bodega @relation(fields: [bodegaDestinoId], references: [id])
+
+  confirmadoPor Usuario @relation("IngresoConfirmadoPor", fields: [confirmadoPorId], references: [id])
+
+  detalles DetalleIngresoInventario[]
+
+  movimientos MovimientoInventario[]
+
+  @@index([bodegaDestinoId])
+  @@index([confirmadoPorId])
+  @@map("ingresos_inventario")
+}
+
+model DetalleIngresoInventario {
+  id                     Int      @id @default(autoincrement())
+  ingresoInventarioId    Int
+  detalleActaRecepcionId Int      @unique
+  loteId                 Int
+  cantidadIngresada      Int
+  costoUnitario          Decimal? @db.Decimal(12, 2)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  ingresoInventario IngresoInventario @relation(fields: [ingresoInventarioId], references: [id], onDelete: Cascade)
+
+  detalleActaRecepcion DetalleActaRecepcion @relation(fields: [detalleActaRecepcionId], references: [id])
+
+  lote LoteInventario @relation(fields: [loteId], references: [id])
+
+  @@index([ingresoInventarioId])
+  @@index([loteId])
+  @@map("detalles_ingreso_inventario")
+}
+
+model ExistenciaInventario {
+  id        Int      @id @default(autoincrement())
+  loteId    Int
+  bodegaId  Int
+  cantidad  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lote LoteInventario @relation(fields: [loteId], references: [id], onDelete: Cascade)
+
+  bodega Bodega @relation(fields: [bodegaId], references: [id])
+
+  @@unique([loteId, bodegaId])
+  @@index([bodegaId])
+  @@map("existencias_inventario")
+}
+
+model MovimientoInventario {
+  id                  Int                      @id @default(autoincrement())
+  loteId              Int
+  tipo                TipoMovimientoInventario
+  cantidad            Int
+  bodegaOrigenId      Int?
+  bodegaDestinoId     Int?
+  usuarioId           Int
+  ingresoInventarioId Int?
+  motivo              String?
+  referencia          String?
+  fechaMovimiento     DateTime                 @default(now())
+  createdAt           DateTime                 @default(now())
+
+  lote LoteInventario @relation(fields: [loteId], references: [id])
+
+  bodegaOrigen Bodega? @relation("MovimientoBodegaOrigen", fields: [bodegaOrigenId], references: [id])
+
+  bodegaDestino Bodega? @relation("MovimientoBodegaDestino", fields: [bodegaDestinoId], references: [id])
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  ingresoInventario IngresoInventario? @relation(fields: [ingresoInventarioId], references: [id])
+
+  @@index([loteId])
+  @@index([bodegaOrigenId])
+  @@index([bodegaDestinoId])
+  @@index([usuarioId])
+  @@index([ingresoInventarioId])
+  @@map("movimientos_inventario")
 }
