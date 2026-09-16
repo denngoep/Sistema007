@@ -98,6 +98,89 @@ export class InventoryService {
     };
   }
 
+  async getExpirations(dias = 90) {
+    if (dias < 1 || dias > 365) {
+      throw new BadRequestException(
+        'Los días para consultar vencimientos deben estar entre 1 y 365',
+      );
+    }
+
+    const ahora = new Date();
+
+    const hoy = new Date(
+      ahora.getFullYear(),
+      ahora.getMonth(),
+      ahora.getDate(),
+    );
+
+    const fechaLimite = new Date(hoy);
+    fechaLimite.setDate(fechaLimite.getDate() + dias);
+    fechaLimite.setHours(23, 59, 59, 999);
+
+    const lotes =
+      await this.inventoryRepository.findBatchesByExpiration(fechaLimite);
+
+    const lotesConExistencia = lotes.filter((lote) =>
+      lote.existencias.some((existencia) => existencia.cantidad > 0),
+    );
+
+    const resultados = lotesConExistencia.map((lote) => {
+      const fechaVencimiento = new Date(lote.fechaVencimiento);
+
+      const fechaVencimientoDia = new Date(
+        fechaVencimiento.getFullYear(),
+        fechaVencimiento.getMonth(),
+        fechaVencimiento.getDate(),
+      );
+
+      const diferenciaMilisegundos =
+        fechaVencimientoDia.getTime() - hoy.getTime();
+
+      const diasParaVencer = Math.ceil(
+        diferenciaMilisegundos / (1000 * 60 * 60 * 24),
+      );
+
+      const estadoVencimiento =
+        diasParaVencer < 0 ? 'VENCIDO' : 'PROXIMO_A_VENCER';
+
+      const cantidadTotal = lote.existencias.reduce(
+        (total, existencia) => total + existencia.cantidad,
+        0,
+      );
+
+      return {
+        loteId: lote.id,
+        numeroLote: lote.numeroLote,
+        fechaVencimiento: lote.fechaVencimiento,
+        diasParaVencer,
+        estadoVencimiento,
+        cantidadTotal,
+        existencias: lote.existencias.map((existencia) => ({
+          bodegaId: existencia.bodegaId,
+          bodega: existencia.bodega.nombre,
+          permiteDispensacion: existencia.bodega.permiteDispensacion,
+          sedeId: existencia.bodega.sede.id,
+          sede: existencia.bodega.sede.nombre,
+          cantidad: existencia.cantidad,
+        })),
+      };
+    });
+
+    return {
+      diasConsultados: dias,
+      fechaConsulta: hoy,
+      fechaLimite,
+      totalLotes: resultados.length,
+      vencidos: resultados.filter(
+        (lote) => lote.estadoVencimiento === 'VENCIDO',
+      ).length,
+      proximosAVencer: resultados.filter(
+        (lote) => lote.estadoVencimiento === 'PROXIMO_A_VENCER',
+      ).length,
+      lotes: resultados,
+    };
+  }
+
   async createWarehouse(createWarehouseDto: CreateWarehouseDto) {
     const sede = await this.inventoryRepository.findSiteById(
       createWarehouseDto.sedeId,

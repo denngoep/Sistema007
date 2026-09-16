@@ -186,6 +186,35 @@ export class InventoryRepository {
     });
   }
 
+  findBatchesByExpiration(fechaLimite: Date) {
+    return this.prisma.loteInventario.findMany({
+      where: {
+        fechaVencimiento: {
+          lte: fechaLimite,
+        },
+      },
+      orderBy: {
+        fechaVencimiento: 'asc',
+      },
+      include: {
+        existencias: {
+          where: {
+            cantidad: {
+              gt: 0,
+            },
+          },
+          include: {
+            bodega: {
+              include: {
+                sede: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async transferStock(data: {
     loteId: number;
     bodegaOrigenId: number;

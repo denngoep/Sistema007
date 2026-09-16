@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
 import { CreateInventoryProductDto } from '../dto/create-inventory-product.dto';
 import { CreateWarehouseDto } from '../dto/create-warehouse.dto';
+import { InventoryExpirationQueryDto } from '../dto/inventory-expiration.dto';
 import {
   AdjustInventoryDto,
   TransferInventoryDto,
@@ -20,6 +21,15 @@ export class InventoryController {
   @Get('products')
   getAllProducts() {
     return this.inventoryService.getAllProducts();
+  }
+
+  @Get('expirations')
+  getExpirations(
+    @Query() inventoryExpirationQueryDto: InventoryExpirationQueryDto,
+  ) {
+    return this.inventoryService.getExpirations(
+      inventoryExpirationQueryDto.dias ?? 90,
+    );
   }
 
   @Post('warehouses')
