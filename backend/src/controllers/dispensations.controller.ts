@@ -1,6 +1,14 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 
 import { CreateDispensationDto } from '../dto/create-dispensation.dto';
+import { RegisterDispensationSignatureDto } from '../dto/register-dispensation-signature.dto';
 import { ValidateDispensationDto } from '../dto/validate-dispensation.dto';
 import { DispensationsService } from '../services/dispensations.service';
 
@@ -24,5 +32,20 @@ export class DispensationsController {
   @Post()
   createDispensation(@Body() dto: CreateDispensationDto) {
     return this.dispensationsService.createDispensation(dto);
+  }
+
+  // HU-026 - Generar comprobante de dispensación.
+  @Post(':id/receipt')
+  generateReceipt(@Param('id', ParseIntPipe) dispensacionId: number) {
+    return this.dispensationsService.generateReceipt(dispensacionId);
+  }
+
+  // HU-027 - Registrar firma del paciente como evidencia de la dispensación.
+  @Post(':id/signature')
+  registerSignature(
+    @Param('id', ParseIntPipe) dispensacionId: number,
+    @Body() dto: RegisterDispensationSignatureDto,
+  ) {
+    return this.dispensationsService.registerSignature(dispensacionId, dto);
   }
 }

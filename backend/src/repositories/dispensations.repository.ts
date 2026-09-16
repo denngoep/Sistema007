@@ -218,8 +218,6 @@ export class DispensationsRepository {
     observaciones?: string,
   ) {
     return this.prisma.$transaction(async (tx) => {
-      // Consultamos nuevamente las existencias dentro de la transacción.
-      // FEFO: primero vence, primero sale.
       const existencias = await tx.existenciaInventario.findMany({
         where: {
           bodegaId,
@@ -278,7 +276,6 @@ export class DispensationsRepository {
         .toString()
         .padStart(4, '0')}`;
 
-      // Primero se crea la dispensación como pendiente.
       const dispensacion = await tx.dispensacion.create({
         data: {
           numeroDispensacion,
@@ -294,7 +291,6 @@ export class DispensationsRepository {
 
       let cantidadPendiente = cantidad;
 
-      // Recorremos las existencias en orden FEFO.
       for (const existencia of existencias) {
         if (cantidadPendiente <= 0) {
           break;
@@ -305,7 +301,6 @@ export class DispensationsRepository {
           cantidadPendiente,
         );
 
-        // Descontamos la cantidad del lote.
         const actualizacion = await tx.existenciaInventario.updateMany({
           where: {
             id: existencia.id,
@@ -326,7 +321,6 @@ export class DispensationsRepository {
           );
         }
 
-        // Registramos qué lote y qué cantidad fueron entregados.
         await tx.detalleDispensacion.create({
           data: {
             dispensacionId: dispensacion.id,
@@ -336,7 +330,6 @@ export class DispensationsRepository {
           },
         });
 
-        // Registramos la salida en los movimientos de inventario.
         await tx.movimientoInventario.create({
           data: {
             loteId: existencia.loteId,
@@ -357,7 +350,6 @@ export class DispensationsRepository {
         throw new Error('No fue posible completar la cantidad solicitada.');
       }
 
-      // Si todo salió correctamente, confirmamos la dispensación.
       return tx.dispensacion.update({
         where: {
           id: dispensacion.id,
@@ -398,6 +390,157 @@ export class DispensationsRepository {
           movimientos: true,
         },
       });
+    });
+  }
+
+  // HU-026 y HU-027:
+  // consultar una dispensación con la información necesaria
+  // para el comprobante y la evidencia de recepción.
+  findDispensationById(dispensacionId: number) {
+    return this.prisma.dispensacion.findUnique({
+      where: {
+        id: dispensacionId,
+      },
+      include: {
+        paciente: true,
+        bodega: {
+          include: {
+            sede: true,
+          },
+        },
+        dispensadoPor: {
+          select: {
+            id: true,
+            nombre: true,
+            rol: true,
+          },
+        },
+        detalles: {
+          include: {
+            lote: {
+              include: {
+                productoInventario: true,
+              },
+            },
+            detalleFormulacion: true,
+          },
+        },
+      },
+    });
+  }
+
+  // HU-026 - Registrar número y fecha del comprobante.
+  generateReceipt(
+    dispensacionId: number,
+    numeroComprobante: string,
+    fechaComprobante: Date,
+  ) {
+    return this.prisma.dispensacion.update({
+      where: {
+        id: dispensacionId,
+      },
+      data: {
+        numeroComprobante,
+        fechaComprobante,
+      },
+      include: {
+        paciente: true,
+        bodega: {
+          include: {
+            sede: true,
+          },
+        },
+        dispensadoPor: {
+          select: {
+            id: true,
+            nombre: true,
+            rol: true,
+          },
+        },
+        detalles: {
+          include: {
+            lote: {
+              include: {
+                productoInventario: true,
+              },
+            },
+            detalleFormulacion: true,
+          },
+        },
+      },
+    });
+  }
+
+  // HU-027 - Registrar firma digital capturada directamente
+  // durante la entrega del medicamento.
+  registerDigitalSignature(
+    dispensacionId: number,
+    firmaPaciente: string,
+    fechaFirma: Date,
+  ) {
+    return this.prisma.dispensacion.update({
+      where: {
+        id: dispensacionId,
+      },
+      data: {
+        tipoFirma: 'DIGITAL',
+        firmaPaciente,
+        soporteFirmado: null,
+        fechaFirma,
+        fechaCargaSoporte: null,
+      },
+      include: {
+        paciente: true,
+        bodega: {
+          include: {
+            sede: true,
+          },
+        },
+        dispensadoPor: {
+          select: {
+            id: true,
+            nombre: true,
+            rol: true,
+          },
+        },
+      },
+    });
+  }
+
+  // HU-027 - Registrar el soporte de contingencia firmado
+  // físicamente por el paciente y cargado posteriormente.
+  registerManualSignatureSupport(
+    dispensacionId: number,
+    soporteFirmado: string,
+    fechaFirma: Date,
+    fechaCargaSoporte: Date,
+  ) {
+    return this.prisma.dispensacion.update({
+      where: {
+        id: dispensacionId,
+      },
+      data: {
+        tipoFirma: 'MANUAL',
+        firmaPaciente: null,
+        soporteFirmado,
+        fechaFirma,
+        fechaCargaSoporte,
+      },
+      include: {
+        paciente: true,
+        bodega: {
+          include: {
+            sede: true,
+          },
+        },
+        dispensadoPor: {
+          select: {
+            id: true,
+            nombre: true,
+            rol: true,
+          },
+        },
+      },
     });
   }
 }

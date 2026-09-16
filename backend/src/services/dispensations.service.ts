@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { CreateDispensationDto } from '../dto/create-dispensation.dto';
+import { RegisterDispensationSignatureDto } from '../dto/register-dispensation-signature.dto';
 import { ValidateDispensationDto } from '../dto/validate-dispensation.dto';
 import { DispensationsRepository } from '../repositories/dispensations.repository';
 
@@ -223,7 +224,6 @@ export class DispensationsService {
       );
     }
 
-    // HU-024 - Evitar doble dispensación.
     const periodoAnio = ahora.getFullYear();
     const periodoMes = ahora.getMonth() + 1;
 
@@ -362,13 +362,7 @@ export class DispensationsService {
     };
   }
 
-  // HU-025 - Registrar dispensación.
   async createDispensation(dto: CreateDispensationDto) {
-    /*
-     * Reutilizamos HU-023 y HU-024 antes de registrar:
-     * valida paciente, formulación, vigencia, cantidad,
-     * inventario, FEFO y doble dispensación.
-     */
     await this.validateDispensation({
       numeroDocumento: dto.numeroDocumento,
       formulacionId: dto.formulacionId,
@@ -443,10 +437,6 @@ export class DispensationsService {
     const periodoAnio = ahora.getFullYear();
     const periodoMes = ahora.getMonth() + 1;
 
-    /*
-     * Se vuelve a comprobar HU-024 justo antes de crear
-     * la dispensación.
-     */
     const dispensacionExistente =
       await this.dispensationsRepository.findDispensationForPeriod(
         paciente.id,
@@ -504,5 +494,288 @@ export class DispensationsService {
 
       throw new BadRequestException(mensaje);
     }
+  }
+
+  // HU-026 - Generar comprobante de dispensación.
+  async generateReceipt(dispensacionId: number) {
+    if (!Number.isInteger(dispensacionId) || dispensacionId <= 0) {
+      throw new BadRequestException(
+        'El identificador de la dispensación no es válido',
+      );
+    }
+
+    const dispensacion =
+      await this.dispensationsRepository.findDispensationById(dispensacionId);
+
+    if (!dispensacion) {
+      throw new NotFoundException('No se encontró la dispensación indicada');
+    }
+
+    if (dispensacion.estado !== 'CONFIRMADA') {
+      throw new BadRequestException(
+        'Solo se puede generar comprobante para una dispensación confirmada',
+      );
+    }
+
+    if (dispensacion.numeroComprobante && dispensacion.fechaComprobante) {
+      return {
+        generado: true,
+        mensaje: 'La dispensación ya cuenta con un comprobante generado',
+        comprobante: {
+          numeroComprobante: dispensacion.numeroComprobante,
+          fechaComprobante: dispensacion.fechaComprobante,
+          numeroDispensacion: dispensacion.numeroDispensacion,
+          fechaDispensacion: dispensacion.fechaDispensacion,
+          paciente: {
+            id: dispensacion.paciente.id,
+            tipoDocumento: dispensacion.paciente.tipoDocumento,
+            numeroDocumento: dispensacion.paciente.numeroDocumento,
+            nombres: dispensacion.paciente.nombres,
+            apellidos: dispensacion.paciente.apellidos,
+          },
+          sede: dispensacion.bodega.sede.nombre,
+          bodega: dispensacion.bodega.nombre,
+          dispensadoPor: dispensacion.dispensadoPor,
+          medicamentos: dispensacion.detalles.map((detalle) => ({
+            medicamento: detalle.detalleFormulacion.medicamento,
+            concentracion: detalle.detalleFormulacion.concentracion,
+            formaFarmaceutica: detalle.detalleFormulacion.formaFarmaceutica,
+            cantidadEntregada: detalle.cantidadEntregada,
+            numeroLote: detalle.lote.numeroLote,
+            fechaVencimiento: detalle.lote.fechaVencimiento,
+          })),
+        },
+      };
+    }
+
+    const ahora = new Date();
+
+    const numeroComprobante = `COMP-${ahora.getFullYear()}${String(
+      ahora.getMonth() + 1,
+    ).padStart(2, '0')}${String(ahora.getDate()).padStart(
+      2,
+      '0',
+    )}-${dispensacion.id}-${Date.now()}`;
+
+    const dispensacionActualizada =
+      await this.dispensationsRepository.generateReceipt(
+        dispensacion.id,
+        numeroComprobante,
+        ahora,
+      );
+
+    return {
+      generado: true,
+      mensaje: 'Comprobante generado correctamente',
+
+      comprobante: {
+        numeroComprobante: dispensacionActualizada.numeroComprobante,
+        fechaComprobante: dispensacionActualizada.fechaComprobante,
+
+        numeroDispensacion: dispensacionActualizada.numeroDispensacion,
+        fechaDispensacion: dispensacionActualizada.fechaDispensacion,
+
+        paciente: {
+          id: dispensacionActualizada.paciente.id,
+          tipoDocumento: dispensacionActualizada.paciente.tipoDocumento,
+          numeroDocumento: dispensacionActualizada.paciente.numeroDocumento,
+          nombres: dispensacionActualizada.paciente.nombres,
+          apellidos: dispensacionActualizada.paciente.apellidos,
+        },
+
+        sede: dispensacionActualizada.bodega.sede.nombre,
+        bodega: dispensacionActualizada.bodega.nombre,
+
+        dispensadoPor: dispensacionActualizada.dispensadoPor,
+
+        medicamentos: dispensacionActualizada.detalles.map((detalle) => ({
+          medicamento: detalle.detalleFormulacion.medicamento,
+          concentracion: detalle.detalleFormulacion.concentracion,
+          formaFarmaceutica: detalle.detalleFormulacion.formaFarmaceutica,
+          cantidadEntregada: detalle.cantidadEntregada,
+          numeroLote: detalle.lote.numeroLote,
+          fechaVencimiento: detalle.lote.fechaVencimiento,
+        })),
+      },
+    };
+  }
+
+  // HU-027 - Registrar firma del paciente como evidencia de la dispensación.
+  async registerSignature(
+    dispensacionId: number,
+    dto: RegisterDispensationSignatureDto,
+  ) {
+    if (!Number.isInteger(dispensacionId) || dispensacionId <= 0) {
+      throw new BadRequestException(
+        'El identificador de la dispensación no es válido',
+      );
+    }
+
+    const dispensacion =
+      await this.dispensationsRepository.findDispensationById(dispensacionId);
+
+    if (!dispensacion) {
+      throw new NotFoundException('No se encontró la dispensación indicada');
+    }
+
+    if (dispensacion.estado !== 'CONFIRMADA') {
+      throw new BadRequestException(
+        'Solo se puede registrar la firma de una dispensación confirmada',
+      );
+    }
+
+    if (!dispensacion.numeroComprobante || !dispensacion.fechaComprobante) {
+      throw new BadRequestException(
+        'La dispensación debe tener un comprobante generado antes de registrar la firma del paciente',
+      );
+    }
+
+    /*
+     * La evidencia de la dispensación no debe sobrescribirse.
+     * Una vez registrada la firma, forma parte de la trazabilidad
+     * de la entrega realizada al paciente.
+     */
+    if (
+      dispensacion.tipoFirma ||
+      dispensacion.firmaPaciente ||
+      dispensacion.soporteFirmado ||
+      dispensacion.fechaFirma
+    ) {
+      throw new ConflictException({
+        codigo: 'EVIDENCIA_DISPENSACION_YA_REGISTRADA',
+        mensaje: 'La dispensación ya cuenta con evidencia de firma registrada.',
+        evidencia: {
+          tipoFirma: dispensacion.tipoFirma,
+          fechaFirma: dispensacion.fechaFirma,
+          fechaCargaSoporte: dispensacion.fechaCargaSoporte,
+        },
+      });
+    }
+
+    if (dto.tipoFirma === 'DIGITAL') {
+      const firmaPaciente = dto.firmaPaciente?.trim();
+
+      if (!firmaPaciente) {
+        throw new BadRequestException(
+          'La firma digital del paciente es obligatoria',
+        );
+      }
+
+      if (dto.soporteFirmado?.trim()) {
+        throw new BadRequestException(
+          'Una firma digital no debe incluir soporte manual',
+        );
+      }
+
+      const fechaFirma = new Date();
+
+      const actualizada =
+        await this.dispensationsRepository.registerDigitalSignature(
+          dispensacion.id,
+          firmaPaciente,
+          fechaFirma,
+        );
+
+      return {
+        registrada: true,
+        mensaje: 'Firma digital del paciente registrada correctamente',
+
+        evidenciaDispensacion: {
+          dispensacionId: actualizada.id,
+          numeroDispensacion: actualizada.numeroDispensacion,
+          numeroComprobante: actualizada.numeroComprobante,
+          tipoFirma: actualizada.tipoFirma,
+          fechaFirma: actualizada.fechaFirma,
+          fechaCargaSoporte: actualizada.fechaCargaSoporte,
+
+          paciente: {
+            id: actualizada.paciente.id,
+            tipoDocumento: actualizada.paciente.tipoDocumento,
+            numeroDocumento: actualizada.paciente.numeroDocumento,
+            nombres: actualizada.paciente.nombres,
+            apellidos: actualizada.paciente.apellidos,
+          },
+
+          sede: actualizada.bodega.sede.nombre,
+          bodega: actualizada.bodega.nombre,
+          dispensadoPor: actualizada.dispensadoPor,
+        },
+      };
+    }
+
+    if (dto.tipoFirma === 'MANUAL') {
+      const soporteFirmado = dto.soporteFirmado?.trim();
+
+      if (!soporteFirmado) {
+        throw new BadRequestException(
+          'El soporte firmado por el paciente es obligatorio para una firma manual',
+        );
+      }
+
+      if (dto.firmaPaciente?.trim()) {
+        throw new BadRequestException(
+          'Una firma manual no debe incluir una firma digital',
+        );
+      }
+
+      if (!dto.fechaFirma) {
+        throw new BadRequestException(
+          'La fecha real de la firma es obligatoria cuando el soporte fue firmado manualmente',
+        );
+      }
+
+      const fechaFirma = new Date(dto.fechaFirma);
+
+      if (Number.isNaN(fechaFirma.getTime())) {
+        throw new BadRequestException(
+          'La fecha de firma indicada no es válida',
+        );
+      }
+
+      const fechaCargaSoporte = new Date();
+
+      if (fechaFirma > fechaCargaSoporte) {
+        throw new BadRequestException(
+          'La fecha de firma no puede ser posterior a la fecha de carga del soporte',
+        );
+      }
+
+      const actualizada =
+        await this.dispensationsRepository.registerManualSignatureSupport(
+          dispensacion.id,
+          soporteFirmado,
+          fechaFirma,
+          fechaCargaSoporte,
+        );
+
+      return {
+        registrada: true,
+        mensaje: 'Soporte firmado manualmente registrado correctamente',
+
+        evidenciaDispensacion: {
+          dispensacionId: actualizada.id,
+          numeroDispensacion: actualizada.numeroDispensacion,
+          numeroComprobante: actualizada.numeroComprobante,
+          tipoFirma: actualizada.tipoFirma,
+          soporteFirmado: actualizada.soporteFirmado,
+          fechaFirma: actualizada.fechaFirma,
+          fechaCargaSoporte: actualizada.fechaCargaSoporte,
+
+          paciente: {
+            id: actualizada.paciente.id,
+            tipoDocumento: actualizada.paciente.tipoDocumento,
+            numeroDocumento: actualizada.paciente.numeroDocumento,
+            nombres: actualizada.paciente.nombres,
+            apellidos: actualizada.paciente.apellidos,
+          },
+
+          sede: actualizada.bodega.sede.nombre,
+          bodega: actualizada.bodega.nombre,
+          dispensadoPor: actualizada.dispensadoPor,
+        },
+      };
+    }
+
+    throw new BadRequestException('El tipo de firma debe ser DIGITAL o MANUAL');
   }
 }

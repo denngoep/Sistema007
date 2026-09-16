@@ -83,6 +83,13 @@ enum EstadoDispensacion {
   ANULADA
 }
 
+// HU-027: modalidad utilizada para dejar evidencia
+// de la recepción de los medicamentos.
+enum TipoFirmaDispensacion {
+  DIGITAL
+  MANUAL
+}
+
 model Usuario {
   id               Int        @id @default(autoincrement())
   nombre           String
@@ -584,8 +591,13 @@ model Dispensacion {
   fechaComprobante  DateTime?
 
   // HU-027: evidencia de recepción del paciente.
-  firmaPaciente String?
-  fechaFirma    DateTime?
+  // DIGITAL: firma capturada directamente desde el sistema.
+  // MANUAL: comprobante impreso, firmado físicamente y cargado después.
+  tipoFirma         TipoFirmaDispensacion?
+  firmaPaciente     String?
+  soporteFirmado    String?
+  fechaFirma        DateTime?
+  fechaCargaSoporte DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -622,8 +634,6 @@ model DetalleDispensacion {
 
   lote LoteInventario @relation(fields: [loteId], references: [id])
 
-  // Impide que el mismo medicamento formulado se registre dos veces
-  // dentro de la misma dispensación.
   @@unique([dispensacionId, detalleFormulacionId, loteId])
   @@index([detalleFormulacionId])
   @@index([loteId])
