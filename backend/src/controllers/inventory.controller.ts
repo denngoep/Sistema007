@@ -3,6 +3,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CreateInventoryProductDto } from '../dto/create-inventory-product.dto';
 import { CreateWarehouseDto } from '../dto/create-warehouse.dto';
 import { InventoryExpirationQueryDto } from '../dto/inventory-expiration.dto';
+import { ManageExpiredInventoryDto } from '../dto/manage-expired-inventory.dto';
 import {
   AdjustInventoryDto,
   TransferInventoryDto,
@@ -52,5 +53,17 @@ export class InventoryController {
     const usuarioId = 1;
 
     return this.inventoryService.adjustInventory(adjustInventoryDto, usuarioId);
+  }
+
+  @Post('expired/manage')
+  manageExpiredInventory(
+    @Body() manageExpiredInventoryDto: ManageExpiredInventoryDto,
+  ) {
+    const usuarioId = 1;
+
+    return this.inventoryService.manageExpiredInventory(
+      manageExpiredInventoryDto,
+      usuarioId,
+    );
   }
 }

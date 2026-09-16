@@ -7,6 +7,7 @@ import {
 
 import { CreateInventoryProductDto } from '../dto/create-inventory-product.dto';
 import { CreateWarehouseDto } from '../dto/create-warehouse.dto';
+import { ManageExpiredInventoryDto } from '../dto/manage-expired-inventory.dto';
 import {
   AdjustInventoryDto,
   TransferInventoryDto,
@@ -378,6 +379,138 @@ export class InventoryService {
         if (error.message === 'STOCK_INSUFICIENTE') {
           throw new BadRequestException(
             'No hay existencias suficientes para realizar el ajuste',
+          );
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  async manageExpiredInventory(
+    manageExpiredInventoryDto: ManageExpiredInventoryDto,
+    usuarioId: number,
+  ) {
+    const lote = await this.inventoryRepository.findBatchById(
+      manageExpiredInventoryDto.loteId,
+    );
+
+    if (!lote) {
+      throw new NotFoundException('El lote indicado no existe');
+    }
+
+    const ahora = new Date();
+
+    const hoy = new Date(
+      ahora.getFullYear(),
+      ahora.getMonth(),
+      ahora.getDate(),
+    );
+
+    const fechaVencimiento = new Date(lote.fechaVencimiento);
+
+    const fechaVencimientoDia = new Date(
+      fechaVencimiento.getFullYear(),
+      fechaVencimiento.getMonth(),
+      fechaVencimiento.getDate(),
+    );
+
+    if (fechaVencimientoDia >= hoy) {
+      throw new BadRequestException('El lote todavía no se encuentra vencido');
+    }
+
+    if (
+      manageExpiredInventoryDto.bodegaOrigenId ===
+      manageExpiredInventoryDto.bodegaDestinoId
+    ) {
+      throw new BadRequestException(
+        'La bodega de origen y la bodega de destino deben ser diferentes',
+      );
+    }
+
+    const bodegaOrigen = await this.inventoryRepository.findWarehouseById(
+      manageExpiredInventoryDto.bodegaOrigenId,
+    );
+
+    if (!bodegaOrigen) {
+      throw new NotFoundException('La bodega de origen no existe');
+    }
+
+    if (!bodegaOrigen.activa) {
+      throw new BadRequestException('La bodega de origen está inactiva');
+    }
+
+    if (!bodegaOrigen.permiteDispensacion) {
+      throw new BadRequestException(
+        'La bodega de origen no corresponde a una bodega dispensable',
+      );
+    }
+
+    const bodegaDestino = await this.inventoryRepository.findWarehouseById(
+      manageExpiredInventoryDto.bodegaDestinoId,
+    );
+
+    if (!bodegaDestino) {
+      throw new NotFoundException('La bodega de destino no existe');
+    }
+
+    if (!bodegaDestino.activa) {
+      throw new BadRequestException('La bodega de destino está inactiva');
+    }
+
+    if (bodegaDestino.permiteDispensacion) {
+      throw new BadRequestException(
+        'La bodega de destino debe ser una bodega no dispensable',
+      );
+    }
+
+    const existencia = await this.inventoryRepository.findStock(
+      manageExpiredInventoryDto.loteId,
+      manageExpiredInventoryDto.bodegaOrigenId,
+    );
+
+    if (!existencia || existencia.cantidad <= 0) {
+      throw new BadRequestException(
+        'El lote no tiene existencias disponibles en la bodega de origen',
+      );
+    }
+
+    const cantidadTrasladada = existencia.cantidad;
+
+    try {
+      const resultado = await this.inventoryRepository.transferStock({
+        loteId: manageExpiredInventoryDto.loteId,
+        bodegaOrigenId: manageExpiredInventoryDto.bodegaOrigenId,
+        bodegaDestinoId: manageExpiredInventoryDto.bodegaDestinoId,
+        cantidad: cantidadTrasladada,
+        usuarioId,
+        motivo: manageExpiredInventoryDto.motivo,
+        referencia:
+          manageExpiredInventoryDto.referencia ?? 'GESTION_PRODUCTO_VENCIDO',
+      });
+
+      return {
+        mensaje:
+          'Medicamento vencido trasladado a producto no conforme correctamente',
+        loteId: lote.id,
+        numeroLote: lote.numeroLote,
+        fechaVencimiento: lote.fechaVencimiento,
+        cantidadTrasladada,
+        bodegaOrigen: bodegaOrigen.nombre,
+        bodegaDestino: bodegaDestino.nombre,
+        movimiento: resultado.movimiento,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'EXISTENCIA_ORIGEN_NO_ENCONTRADA') {
+          throw new NotFoundException(
+            'El lote no tiene existencia registrada en la bodega de origen',
+          );
+        }
+
+        if (error.message === 'STOCK_INSUFICIENTE') {
+          throw new BadRequestException(
+            'No hay existencias suficientes para gestionar el medicamento vencido',
           );
         }
       }
