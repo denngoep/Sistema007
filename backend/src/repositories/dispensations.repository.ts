@@ -61,4 +61,90 @@ export class DispensationsRepository {
       },
     });
   }
+
+  findFormulationDetail(formulacionId: number, detalleFormulacionId: number) {
+    return this.prisma.detalleFormulacion.findFirst({
+      where: {
+        id: detalleFormulacionId,
+        formulacionId,
+      },
+      include: {
+        formulacion: {
+          include: {
+            atencionClinica: {
+              include: {
+                historiaClinica: {
+                  include: {
+                    paciente: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  findClinicalMedication(
+    medicamento: string,
+    concentracion: string | null,
+    formaFarmaceutica: string | null,
+  ) {
+    return this.prisma.medicamento.findFirst({
+      where: {
+        nombre: medicamento,
+        concentracion: concentracion ?? '',
+        formaFarmaceutica: formaFarmaceutica ?? '',
+        activo: true,
+      },
+    });
+  }
+
+  findDispensableStock(
+    medicamentoId: number,
+    bodegaId: number,
+    fechaActual: Date,
+  ) {
+    return this.prisma.existenciaInventario.findMany({
+      where: {
+        bodegaId,
+        cantidad: {
+          gt: 0,
+        },
+        bodega: {
+          activa: true,
+          permiteDispensacion: true,
+        },
+        lote: {
+          estado: 'DISPONIBLE',
+          fechaVencimiento: {
+            gt: fechaActual,
+          },
+          productoInventario: {
+            medicamentoId,
+            tipo: 'MEDICAMENTO',
+            estado: 'ACTIVO',
+          },
+        },
+      },
+      orderBy: {
+        lote: {
+          fechaVencimiento: 'asc',
+        },
+      },
+      include: {
+        bodega: {
+          include: {
+            sede: true,
+          },
+        },
+        lote: {
+          include: {
+            productoInventario: true,
+          },
+        },
+      },
+    });
+  }
 }
