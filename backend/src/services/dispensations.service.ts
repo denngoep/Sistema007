@@ -1,9 +1,11 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
+import { CreateDispensationDto } from '../dto/create-dispensation.dto';
 import { ValidateDispensationDto } from '../dto/validate-dispensation.dto';
 import { DispensationsRepository } from '../repositories/dispensations.repository';
 
@@ -48,16 +50,16 @@ export class DispensationsService {
         atencion.formulaciones
           .filter((formulacion) => {
             const fechaInicio = new Date(formulacion.fechaFormulacion);
-
             const fechaFin = new Date(fechaInicio);
+
             fechaFin.setMonth(fechaFin.getMonth() + formulacion.vigenciaMeses);
 
             return ahora < fechaFin;
           })
           .map((formulacion) => {
             const fechaInicio = new Date(formulacion.fechaFormulacion);
-
             const fechaFin = new Date(fechaInicio);
+
             fechaFin.setMonth(fechaFin.getMonth() + formulacion.vigenciaMeses);
 
             return {
@@ -187,6 +189,7 @@ export class DispensationsService {
     }
 
     const fechaInicio = new Date(detalle.formulacion.fechaFormulacion);
+
     const fechaFinVigencia = new Date(fechaInicio);
 
     fechaFinVigencia.setMonth(
@@ -218,6 +221,44 @@ export class DispensationsService {
       throw new NotFoundException(
         'El medicamento formulado no se encuentra asociado al catálogo clínico',
       );
+    }
+
+    // HU-024 - Evitar doble dispensación.
+    const periodoAnio = ahora.getFullYear();
+    const periodoMes = ahora.getMonth() + 1;
+
+    const dispensacionExistente =
+      await this.dispensationsRepository.findDispensationForPeriod(
+        paciente.id,
+        detalle.id,
+        periodoAnio,
+        periodoMes,
+      );
+
+    if (dispensacionExistente) {
+      throw new ConflictException({
+        valida: false,
+        codigo: 'MEDICAMENTO_YA_DISPENSADO',
+        mensaje:
+          'Ya se realizó la entrega de este medicamento para el período actual.',
+        periodo: {
+          anio: periodoAnio,
+          mes: periodoMes,
+        },
+        entregaAnterior: {
+          dispensacionId: dispensacionExistente.dispensacion.id,
+          numeroDispensacion:
+            dispensacionExistente.dispensacion.numeroDispensacion,
+          fechaDispensacion:
+            dispensacionExistente.dispensacion.fechaDispensacion,
+          cantidadEntregada: dispensacionExistente.cantidadEntregada,
+          numeroLote: dispensacionExistente.lote.numeroLote,
+          bodega: dispensacionExistente.dispensacion.bodega.nombre,
+          sede: dispensacionExistente.dispensacion.bodega.sede.nombre,
+          dispensadoPor:
+            dispensacionExistente.dispensacion.dispensadoPor.nombre,
+        },
+      });
     }
 
     const existencias = await this.dispensationsRepository.findDispensableStock(
@@ -277,6 +318,11 @@ export class DispensationsService {
       mensaje:
         'La entrega cumple las condiciones para continuar con la dispensación',
 
+      periodoDispensacion: {
+        anio: periodoAnio,
+        mes: periodoMes,
+      },
+
       paciente: {
         id: paciente.id,
         tipoDocumento: paciente.tipoDocumento,
@@ -314,5 +360,149 @@ export class DispensationsService {
         lotesSugeridos,
       },
     };
+  }
+
+  // HU-025 - Registrar dispensación.
+  async createDispensation(dto: CreateDispensationDto) {
+    /*
+     * Reutilizamos HU-023 y HU-024 antes de registrar:
+     * valida paciente, formulación, vigencia, cantidad,
+     * inventario, FEFO y doble dispensación.
+     */
+    await this.validateDispensation({
+      numeroDocumento: dto.numeroDocumento,
+      formulacionId: dto.formulacionId,
+      detalleFormulacionId: dto.detalleFormulacionId,
+      cantidad: dto.cantidad,
+      bodegaId: dto.bodegaId,
+    });
+
+    const documento = dto.numeroDocumento.trim();
+
+    const paciente =
+      await this.dispensationsRepository.findPatientByDocument(documento);
+
+    if (!paciente) {
+      throw new NotFoundException('No se encontró el paciente indicado');
+    }
+
+    const detalle = await this.dispensationsRepository.findFormulationDetail(
+      dto.formulacionId,
+      dto.detalleFormulacionId,
+    );
+
+    if (!detalle) {
+      throw new NotFoundException(
+        'No se encontró el medicamento de la formulación',
+      );
+    }
+
+    const medicamento =
+      await this.dispensationsRepository.findClinicalMedication(
+        detalle.medicamento,
+        detalle.concentracion,
+        detalle.formaFarmaceutica,
+      );
+
+    if (!medicamento) {
+      throw new NotFoundException(
+        'El medicamento no se encuentra asociado al catálogo clínico',
+      );
+    }
+
+    const usuario = await this.dispensationsRepository.findUserById(
+      dto.usuarioId,
+    );
+
+    if (!usuario) {
+      throw new NotFoundException(
+        'No se encontró el usuario que realiza la dispensación',
+      );
+    }
+
+    if (!usuario.activo) {
+      throw new BadRequestException(
+        'El usuario que realiza la dispensación se encuentra inactivo',
+      );
+    }
+
+    const rolesFarmacia = [
+      'REGENTE_FARMACIA',
+      'AUXILIAR_FARMACIA',
+      'QUIMICO_FARMACEUTICO',
+      'ADMINISTRADOR',
+    ];
+
+    if (!rolesFarmacia.includes(usuario.rol)) {
+      throw new BadRequestException(
+        'El usuario no tiene un rol autorizado para realizar dispensaciones',
+      );
+    }
+
+    const ahora = new Date();
+    const periodoAnio = ahora.getFullYear();
+    const periodoMes = ahora.getMonth() + 1;
+
+    /*
+     * Se vuelve a comprobar HU-024 justo antes de crear
+     * la dispensación.
+     */
+    const dispensacionExistente =
+      await this.dispensationsRepository.findDispensationForPeriod(
+        paciente.id,
+        detalle.id,
+        periodoAnio,
+        periodoMes,
+      );
+
+    if (dispensacionExistente) {
+      throw new ConflictException({
+        codigo: 'MEDICAMENTO_YA_DISPENSADO',
+        mensaje:
+          'Ya se realizó la entrega de este medicamento para el período actual.',
+        periodo: {
+          anio: periodoAnio,
+          mes: periodoMes,
+        },
+        numeroDispensacion:
+          dispensacionExistente.dispensacion.numeroDispensacion,
+      });
+    }
+
+    try {
+      const dispensacion =
+        await this.dispensationsRepository.createDispensation(
+          paciente.id,
+          detalle.id,
+          medicamento.id,
+          dto.cantidad,
+          dto.bodegaId,
+          dto.usuarioId,
+          periodoAnio,
+          periodoMes,
+          dto.observaciones,
+        );
+
+      return {
+        registrada: true,
+        mensaje: 'Dispensación registrada correctamente',
+        dispensacion,
+      };
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+
+      const mensaje =
+        error instanceof Error
+          ? error.message
+          : 'No fue posible registrar la dispensación';
+
+      throw new BadRequestException(mensaje);
+    }
   }
 }

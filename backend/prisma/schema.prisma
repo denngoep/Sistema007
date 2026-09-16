@@ -74,6 +74,13 @@ enum TipoMovimientoInventario {
   TRASLADO
   AJUSTE_ENTRADA
   AJUSTE_SALIDA
+  DISPENSACION
+}
+
+enum EstadoDispensacion {
+  PENDIENTE
+  CONFIRMADA
+  ANULADA
 }
 
 model Usuario {
@@ -98,6 +105,8 @@ model Usuario {
 
   movimientosInventario MovimientoInventario[]
 
+  dispensaciones Dispensacion[] @relation("DispensacionRealizadaPor")
+
   @@map("usuarios")
 }
 
@@ -115,6 +124,8 @@ model Paciente {
   updatedAt       DateTime @updatedAt
 
   historiaClinica HistoriaClinica?
+
+  dispensaciones Dispensacion[]
 
   @@map("pacientes")
 }
@@ -256,6 +267,8 @@ model DetalleFormulacion {
 
   formulacion Formulacion @relation(fields: [formulacionId], references: [id], onDelete: Cascade)
 
+  detallesDispensacion DetalleDispensacion[]
+
   @@map("detalles_formulacion")
 }
 
@@ -320,6 +333,8 @@ model LoteInventario {
 
   movimientos MovimientoInventario[]
 
+  detallesDispensacion DetalleDispensacion[]
+
   @@unique([productoInventarioId, numeroLote])
   @@map("lotes_inventario")
 }
@@ -364,6 +379,8 @@ model Bodega {
   movimientosOrigen MovimientoInventario[] @relation("MovimientoBodegaOrigen")
 
   movimientosDestino MovimientoInventario[] @relation("MovimientoBodegaDestino")
+
+  dispensaciones Dispensacion[]
 
   @@unique([sedeId, nombre])
   @@index([sedeId])
@@ -523,6 +540,7 @@ model MovimientoInventario {
   bodegaDestinoId     Int?
   usuarioId           Int
   ingresoInventarioId Int?
+  dispensacionId      Int?
   motivo              String?
   referencia          String?
   fechaMovimiento     DateTime                 @default(now())
@@ -538,10 +556,76 @@ model MovimientoInventario {
 
   ingresoInventario IngresoInventario? @relation(fields: [ingresoInventarioId], references: [id])
 
+  dispensacion Dispensacion? @relation(fields: [dispensacionId], references: [id])
+
   @@index([loteId])
   @@index([bodegaOrigenId])
   @@index([bodegaDestinoId])
   @@index([usuarioId])
   @@index([ingresoInventarioId])
+  @@index([dispensacionId])
   @@map("movimientos_inventario")
+}
+
+model Dispensacion {
+  id                 Int                @id @default(autoincrement())
+  numeroDispensacion String             @unique
+  pacienteId         Int
+  bodegaId           Int
+  dispensadoPorId    Int
+  periodoAnio        Int
+  periodoMes         Int
+  fechaDispensacion  DateTime           @default(now())
+  estado             EstadoDispensacion @default(PENDIENTE)
+  observaciones      String?
+
+  // HU-026: comprobante de dispensación.
+  numeroComprobante String?   @unique
+  fechaComprobante  DateTime?
+
+  // HU-027: evidencia de recepción del paciente.
+  firmaPaciente String?
+  fechaFirma    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+
+  bodega Bodega @relation(fields: [bodegaId], references: [id])
+
+  dispensadoPor Usuario @relation("DispensacionRealizadaPor", fields: [dispensadoPorId], references: [id])
+
+  detalles DetalleDispensacion[]
+
+  movimientos MovimientoInventario[]
+
+  @@index([pacienteId])
+  @@index([bodegaId])
+  @@index([dispensadoPorId])
+  @@index([periodoAnio, periodoMes])
+  @@map("dispensaciones")
+}
+
+model DetalleDispensacion {
+  id                   Int      @id @default(autoincrement())
+  dispensacionId       Int
+  detalleFormulacionId Int
+  loteId               Int
+  cantidadEntregada    Int
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  dispensacion Dispensacion @relation(fields: [dispensacionId], references: [id], onDelete: Cascade)
+
+  detalleFormulacion DetalleFormulacion @relation(fields: [detalleFormulacionId], references: [id])
+
+  lote LoteInventario @relation(fields: [loteId], references: [id])
+
+  // Impide que el mismo medicamento formulado se registre dos veces
+  // dentro de la misma dispensación.
+  @@unique([dispensacionId, detalleFormulacionId, loteId])
+  @@index([detalleFormulacionId])
+  @@index([loteId])
+  @@map("detalles_dispensacion")
 }
