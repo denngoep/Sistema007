@@ -34,7 +34,7 @@ function Dashboard() {
       id: "patients",
       icon: "P",
       label: "Pacientes",
-      disabled: true,
+      path: "/patients",
     },
     {
       id: "clinical-history",
