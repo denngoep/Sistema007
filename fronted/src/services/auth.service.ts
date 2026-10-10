@@ -1,6 +1,7 @@
 export interface LoginRequest {
   email: string;
   password: string;
+  captchaToken: string;
 }
 
 export interface LoginUser {
@@ -33,7 +34,11 @@ export async function loginUser(
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "No fue posible iniciar sesión");
+    const message = Array.isArray(data.message)
+      ? data.message.join(", ")
+      : data.message || "No fue posible iniciar sesión";
+
+    throw new Error(message);
   }
 
   return data;
