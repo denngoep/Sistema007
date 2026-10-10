@@ -1,0 +1,878 @@
+.clinical-history-page {
+  min-height: 100vh;
+  background: #f4f7fa;
+  color: #17324d;
+}
+
+.clinical-history-header {
+  min-height: 105px;
+  padding: 22px 36px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e9ee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.clinical-history-section-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #00aebc;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.clinical-history-header h1 {
+  margin: 0;
+  color: #062b55;
+  font-size: 25px;
+}
+
+.clinical-history-header p {
+  margin: 5px 0 0;
+  color: #718492;
+  font-size: 13px;
+}
+
+.clinical-history-back {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid #d6e1e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #062b55;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.clinical-history-back:hover {
+  background: #f4f8fa;
+}
+
+.clinical-history-content {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 26px 28px 42px;
+}
+
+.clinical-history-summary {
+  margin-bottom: 18px;
+  padding: 17px 22px;
+  border: 1px solid #e0e7ec;
+  border-radius: 12px;
+  background: #ffffff;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  box-shadow: 0 4px 14px rgba(28, 63, 91, 0.04);
+}
+
+.clinical-history-summary div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clinical-history-summary span {
+  color: #82929d;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.clinical-history-summary strong {
+  color: #17324d;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.clinical-history-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.clinical-history-card {
+  border: 1px solid #e0e7ec;
+  border-radius: 13px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 5px 16px rgba(28, 63, 91, 0.04);
+}
+
+.clinical-history-card-header {
+  min-height: 66px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e8edf1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.clinical-history-card-header span {
+  display: block;
+  margin-bottom: 3px;
+  color: #00aebc;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.clinical-history-card-header h2 {
+  margin: 0;
+  color: #17324d;
+  font-size: 17px;
+}
+
+.clinical-history-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.clinical-history-action-button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  background: #00aebc;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.clinical-history-action-button:not(:disabled) {
+  cursor: pointer;
+}
+
+.clinical-history-action-button:not(:disabled):hover {
+  background: #009ba7;
+}
+
+.clinical-history-action-button:disabled {
+  background: #dbe4e8;
+  color: #8798a3;
+  cursor: not-allowed;
+}
+
+.clinical-history-count {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #e9f9fa;
+  color: #008c97;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+/* DATOS GENERALES */
+
+.clinical-history-general-data {
+  padding: 4px 20px 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 30px;
+}
+
+.clinical-history-general-data > div {
+  min-width: 0;
+  padding: 13px 0;
+  border-bottom: 1px solid #edf1f4;
+}
+
+.clinical-history-general-data > div:nth-last-child(-n + 2) {
+  border-bottom: none;
+}
+
+.clinical-history-general-data span,
+.clinical-history-formulation-meta span,
+.clinical-history-detail-grid span,
+.clinical-history-detail-block span,
+.clinical-history-medication-grid span,
+.clinical-history-medication-observation span,
+.clinical-history-attention span {
+  display: block;
+  margin-bottom: 4px;
+  color: #7b8d99;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.clinical-history-general-data strong {
+  color: #17324d;
+  font-size: 13px;
+}
+
+.clinical-history-general-data p,
+.clinical-history-formulation-meta p,
+.clinical-history-detail-grid p,
+.clinical-history-detail-block p,
+.clinical-history-medication-grid p,
+.clinical-history-medication-observation p {
+  margin: 0;
+  color: #445f72;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* FORMULARIO DE NUEVA ATENCIÓN */
+
+.clinical-history-attention-form {
+  padding: 20px;
+  background: #fbfcfd;
+  border-bottom: 1px solid #e8edf1;
+}
+
+.clinical-history-form-section {
+  padding: 20px;
+  border: 1px solid #e1e8ed;
+  border-radius: 11px;
+  background: #ffffff;
+}
+
+.clinical-history-form-section + .clinical-history-form-section {
+  margin-top: 16px;
+}
+
+.clinical-history-form-section-header {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #edf1f4;
+}
+
+.clinical-history-form-section-header > span {
+  display: block;
+  margin-bottom: 3px;
+  color: #00aebc;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.clinical-history-form-section-header h3 {
+  margin: 0;
+  color: #062b55;
+  font-size: 16px;
+}
+
+.clinical-history-form-section-header p {
+  margin: 5px 0 0;
+  color: #82929d;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.clinical-history-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.clinical-history-form-grid.two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.clinical-history-form-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clinical-history-form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.clinical-history-form-field label {
+  color: #29465f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.clinical-history-form-field input,
+.clinical-history-form-field textarea,
+.clinical-history-form-field select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d9e3e9;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17324d;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.clinical-history-form-field input,
+.clinical-history-form-field select {
+  min-height: 40px;
+  padding: 0 12px;
+}
+
+.clinical-history-form-field textarea {
+  min-height: 82px;
+  padding: 10px 12px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.clinical-history-form-field input::placeholder,
+.clinical-history-form-field textarea::placeholder {
+  color: #a0adb6;
+}
+
+.clinical-history-form-field input:focus,
+.clinical-history-form-field textarea:focus,
+.clinical-history-form-field select:focus {
+  border-color: #00aebc;
+  box-shadow: 0 0 0 3px rgba(0, 174, 188, 0.08);
+}
+
+/* FORMULACIÓN DENTRO DE LA ATENCIÓN */
+
+.clinical-history-new-medications {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.clinical-history-new-medication {
+  padding: 16px;
+  border: 1px solid #e2e9ee;
+  border-radius: 10px;
+  background: #f8fafb;
+}
+
+.clinical-history-new-medication-header {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.clinical-history-new-medication-header span {
+  display: block;
+  margin-bottom: 2px;
+  color: #00aebc;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.clinical-history-new-medication-header h4 {
+  margin: 0;
+  color: #062b55;
+  font-size: 14px;
+}
+
+.clinical-history-remove-medication {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid #e4caca;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #a44444;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clinical-history-remove-medication:hover {
+  background: #fff3f3;
+}
+
+.clinical-history-medication-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.clinical-history-add-medication {
+  min-height: 36px;
+  margin-top: 14px;
+  padding: 0 14px;
+  border: 1px solid #bfe1e4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #008c97;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clinical-history-add-medication:hover {
+  background: #eaf9fa;
+}
+
+.clinical-history-form-actions {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #e5ebef;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.clinical-history-form-actions .clinical-history-action-button {
+  min-height: 40px;
+  padding: 0 18px;
+}
+
+.clinical-history-cancel-button {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid #d6e1e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #526b7c;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clinical-history-cancel-button:hover:not(:disabled) {
+  background: #f4f8fa;
+}
+
+.clinical-history-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.attention-form-error {
+  margin: 16px 0 0;
+}
+
+.clinical-history-success {
+  margin: 16px 20px 0;
+  padding: 12px 14px;
+  border: 1px solid #bfe3dc;
+  border-radius: 8px;
+  background: #f0faf8;
+  color: #267060;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ATENCIONES CLÍNICAS */
+
+.clinical-history-attentions {
+  padding: 14px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clinical-history-attention {
+  min-height: 68px;
+  padding: 12px 16px;
+  border: 1px solid #e1e8ed;
+  border-radius: 9px;
+  background: #fbfcfd;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1.4fr 1fr;
+  align-items: center;
+  gap: 18px;
+}
+
+.clinical-history-attention > div {
+  min-width: 0;
+}
+
+.clinical-history-attention strong {
+  display: block;
+  color: #29465f;
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* ESTADOS VACÍOS */
+
+.clinical-history-empty {
+  padding: 36px 22px;
+  text-align: center;
+}
+
+.clinical-history-empty strong {
+  color: #29465f;
+  font-size: 13px;
+}
+
+.clinical-history-empty p {
+  max-width: 420px;
+  margin: 6px auto 0;
+  color: #82929d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* FORMULACIONES */
+
+.clinical-history-formulations {
+  padding: 14px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clinical-history-formulation {
+  border: 1px solid #e1e8ed;
+  border-radius: 9px;
+  background: #fbfcfd;
+  overflow: hidden;
+}
+
+.clinical-history-formulation-summary {
+  min-height: 76px;
+  padding: 11px 14px;
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 1.6fr)
+    minmax(420px, 2.2fr)
+    110px;
+  align-items: center;
+  gap: 20px;
+}
+
+.clinical-history-formulation-main {
+  min-width: 0;
+}
+
+.clinical-history-formulation-main > span {
+  display: block;
+  margin-bottom: 3px;
+  color: #00aebc;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.clinical-history-formulation-main strong {
+  display: block;
+  color: #062b55;
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.clinical-history-formulation-main p {
+  margin: 3px 0 0;
+  color: #718492;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.clinical-history-formulation-meta {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 0.8fr 0.8fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.clinical-history-formulation-meta > div {
+  min-width: 0;
+}
+
+.clinical-history-formulation-meta strong {
+  display: block;
+  color: #29465f;
+  font-size: 11px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.clinical-history-status {
+  color: #008c97 !important;
+}
+
+.clinical-history-detail-button {
+  width: 110px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #cfe5e8;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #008c97;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.clinical-history-detail-button:hover {
+  background: #eaf9fa;
+}
+
+.clinical-history-formulation-detail {
+  padding: 18px;
+  border-top: 1px solid #e5ebef;
+  background: #ffffff;
+}
+
+.clinical-history-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.clinical-history-detail-block {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #edf1f4;
+}
+
+.clinical-history-medications {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #edf1f4;
+}
+
+.clinical-history-medications-title {
+  display: block;
+  margin-bottom: 10px;
+  color: #062b55;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.clinical-history-medication {
+  padding: 13px 15px;
+  border: 1px solid #e5ebef;
+  border-radius: 8px;
+  background: #f8fafb;
+}
+
+.clinical-history-medication + .clinical-history-medication {
+  margin-top: 9px;
+}
+
+.clinical-history-medication > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #062b55;
+  font-size: 13px;
+}
+
+.clinical-history-medication-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 20px;
+}
+
+.clinical-history-medication-observation {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid #e5ebef;
+}
+
+/* CARGA Y ERRORES */
+
+.clinical-history-state {
+  max-width: 560px;
+  margin: 70px auto;
+  padding: 30px;
+  border: 1px solid #e0e7ec;
+  border-radius: 14px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(28, 63, 91, 0.05);
+}
+
+.clinical-history-state h2 {
+  margin: 5px 0 10px;
+  color: #062b55;
+}
+
+.clinical-history-state p {
+  color: #718492;
+  font-size: 13px;
+}
+
+.clinical-history-error {
+  padding: 12px;
+  border: 1px solid #f0c9c9;
+  border-radius: 8px;
+  background: #fff3f3;
+  color: #a44444 !important;
+}
+
+.clinical-history-state button {
+  min-height: 38px;
+  margin-top: 14px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: #00aebc;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clinical-history-state button:hover {
+  background: #009ba7;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .clinical-history-formulation-summary {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .clinical-history-formulation-meta {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .clinical-history-detail-button {
+    width: fit-content;
+  }
+
+  .clinical-history-general-data {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clinical-history-detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clinical-history-attention {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clinical-history-medication-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 750px) {
+  .clinical-history-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clinical-history-formulation-meta,
+  .clinical-history-medication-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clinical-history-form-grid.two-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .clinical-history-header {
+    padding: 20px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .clinical-history-content {
+    padding: 20px 16px 35px;
+  }
+
+  .clinical-history-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .clinical-history-card-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .clinical-history-action-button {
+    width: 100%;
+  }
+
+  .clinical-history-summary,
+  .clinical-history-general-data,
+  .clinical-history-formulation-meta,
+  .clinical-history-detail-grid,
+  .clinical-history-medication-grid,
+  .clinical-history-attention,
+  .clinical-history-medication-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .clinical-history-attention-form {
+    padding: 14px;
+  }
+
+  .clinical-history-form-section {
+    padding: 15px;
+  }
+
+  .clinical-history-new-medication {
+    padding: 14px;
+  }
+
+  .clinical-history-new-medication-header {
+    align-items: flex-start;
+  }
+
+  .clinical-history-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .clinical-history-form-actions button {
+    width: 100%;
+  }
+}
+/* CHECKBOX - REQUIERE ESQUEMA DE TRATAMIENTO */
+
+.clinical-history-form-field input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-height: auto;
+  padding: 0;
+  margin: 0;
+  accent-color: #00aebc;
+  cursor: pointer;
+}
+
+.clinical-history-form-field label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  width: fit-content;
+  color: #526b7c;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
