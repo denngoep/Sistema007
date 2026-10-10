@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
 import {
   BadRequestException,
   Injectable,
@@ -10,6 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { CreateFormulationDto } from '../dto/create-formulation.dto';
+import { CreatePatientDiagnosisDto } from '../dto/create-patient-diagnosis.dto';
 import { FormulationsRepository } from '../repositories/formulations.repository';
 
 @Injectable()
@@ -78,6 +74,101 @@ export class FormulationsService {
     }
 
     return this.formulationsRepository.create(createFormulationDto);
+  }
+
+  async createPatientDiagnosis(
+    createPatientDiagnosisDto: CreatePatientDiagnosisDto,
+  ) {
+    const patient = await this.formulationsRepository.findPatientById(
+      createPatientDiagnosisDto.pacienteId,
+    );
+
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrado');
+    }
+
+    if (!patient.activo) {
+      throw new BadRequestException('El paciente se encuentra inactivo');
+    }
+
+    if (!patient.historiaClinica) {
+      throw new NotFoundException(
+        'El paciente no tiene una historia clínica registrada',
+      );
+    }
+
+    if (createPatientDiagnosisDto.atencionClinicaId) {
+      const clinicalCare =
+        await this.formulationsRepository.findClinicalCareById(
+          createPatientDiagnosisDto.atencionClinicaId,
+        );
+
+      if (!clinicalCare) {
+        throw new NotFoundException('La atención clínica indicada no existe');
+      }
+
+      if (clinicalCare.historiaClinicaId !== patient.historiaClinica.id) {
+        throw new BadRequestException(
+          'La atención clínica no pertenece al paciente indicado',
+        );
+      }
+    }
+
+    const nombre = createPatientDiagnosisDto.nombre.trim();
+
+    if (!nombre) {
+      throw new BadRequestException('El nombre del diagnóstico es obligatorio');
+    }
+
+    const codigoCie10 = createPatientDiagnosisDto.codigoCie10
+      ?.trim()
+      .toUpperCase();
+
+    if (codigoCie10) {
+      const existingDiagnosis =
+        await this.formulationsRepository.findDiagnosisByCodeAndPatient(
+          createPatientDiagnosisDto.pacienteId,
+          codigoCie10,
+        );
+
+      if (existingDiagnosis) {
+        throw new BadRequestException(
+          'El paciente ya tiene registrado un diagnóstico activo con este código CIE-10',
+        );
+      }
+    }
+
+    const diagnosis = await this.formulationsRepository.createPatientDiagnosis(
+      patient.historiaClinica.id,
+      {
+        ...createPatientDiagnosisDto,
+        nombre,
+        codigoCie10,
+      },
+    );
+
+    return {
+      message: 'Diagnóstico registrado correctamente',
+      diagnostico: diagnosis,
+    };
+  }
+
+  async getActiveDiagnosesByPatient(patientId: number) {
+    const patient =
+      await this.formulationsRepository.findPatientById(patientId);
+
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrado');
+    }
+
+    const diagnoses =
+      await this.formulationsRepository.findActiveDiagnosesByPatient(patientId);
+
+    return {
+      paciente: patient,
+      totalDiagnosticos: diagnoses.length,
+      diagnosticos: diagnoses,
+    };
   }
 
   async getActiveFormulationsByPatient(patientId: number) {

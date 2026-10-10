@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFormulationDto } from '../dto/create-formulation.dto';
+import { CreatePatientDiagnosisDto } from '../dto/create-patient-diagnosis.dto';
 
 @Injectable()
 export class FormulationsRepository {
@@ -55,6 +53,44 @@ export class FormulationsRepository {
     });
   }
 
+  findActiveDiagnosesByPatient(patientId: number) {
+    return this.prisma.diagnosticoPaciente.findMany({
+      where: {
+        activo: true,
+        historiaClinica: {
+          pacienteId: patientId,
+        },
+      },
+      orderBy: {
+        fechaDiagnostico: 'desc',
+      },
+      select: {
+        id: true,
+        historiaClinicaId: true,
+        atencionClinicaId: true,
+        nombre: true,
+        codigoCie10: true,
+        tipo: true,
+        requiereEsquema: true,
+        fechaDiagnostico: true,
+        observaciones: true,
+        activo: true,
+      },
+    });
+  }
+
+  findDiagnosisByCodeAndPatient(patientId: number, codigoCie10: string) {
+    return this.prisma.diagnosticoPaciente.findFirst({
+      where: {
+        codigoCie10: codigoCie10,
+        activo: true,
+        historiaClinica: {
+          pacienteId: patientId,
+        },
+      },
+    });
+  }
+
   findPatientById(patientId: number) {
     return this.prisma.paciente.findUnique({
       where: {
@@ -66,6 +102,42 @@ export class FormulationsRepository {
         numeroDocumento: true,
         nombres: true,
         apellidos: true,
+        activo: true,
+        historiaClinica: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+  }
+
+  createPatientDiagnosis(
+    historiaClinicaId: number,
+    createPatientDiagnosisDto: CreatePatientDiagnosisDto,
+  ) {
+    return this.prisma.diagnosticoPaciente.create({
+      data: {
+        historiaClinicaId,
+        atencionClinicaId: createPatientDiagnosisDto.atencionClinicaId,
+        nombre: createPatientDiagnosisDto.nombre.trim(),
+        codigoCie10:
+          createPatientDiagnosisDto.codigoCie10?.trim().toUpperCase() || null,
+        tipo: createPatientDiagnosisDto.tipo,
+        requiereEsquema: createPatientDiagnosisDto.requiereEsquema ?? false,
+        observaciones: createPatientDiagnosisDto.observaciones?.trim() || null,
+        activo: true,
+      },
+      select: {
+        id: true,
+        historiaClinicaId: true,
+        atencionClinicaId: true,
+        nombre: true,
+        codigoCie10: true,
+        tipo: true,
+        requiereEsquema: true,
+        fechaDiagnostico: true,
+        observaciones: true,
         activo: true,
       },
     });
