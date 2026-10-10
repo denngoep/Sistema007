@@ -40,7 +40,7 @@ function Dashboard() {
       id: "clinical-history",
       icon: "HC",
       label: "Historia clínica",
-      disabled: true,
+      path: "/clinical-history",
     },
     {
       id: "inventory",

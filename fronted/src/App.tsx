@@ -12,6 +12,9 @@ import Patients from "./pages/Patients";
 import CreatePatient from "./pages/CreatePatient";
 import EditPatient from "./pages/EditPatient";
 
+import ClinicalHistories from "./pages/ClinicalHistories";
+import ClinicalHistory from "./pages/ClinicalHistory";
+
 function App() {
   return (
     <BrowserRouter>
@@ -27,6 +30,13 @@ function App() {
         <Route path="/patients" element={<Patients />} />
         <Route path="/patients/new" element={<CreatePatient />} />
         <Route path="/patients/:id/edit" element={<EditPatient />} />
+
+        <Route path="/clinical-history" element={<ClinicalHistories />} />
+
+        <Route
+          path="/clinical-history/patient/:patientId"
+          element={<ClinicalHistory />}
+        />
       </Routes>
     </BrowserRouter>
   );
