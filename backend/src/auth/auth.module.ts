@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthService } from '../services/auth.service';
 import { AuthRepository } from '../repositories/auth.repository';
+import { MailService } from '../services/mail.service';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { AuthRepository } from '../repositories/auth.repository';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository],
+  providers: [AuthService, AuthRepository, MailService],
 })
 export class AuthModule {}
