@@ -1,71 +1,462 @@
+/* =========================================
+   SISTEMA007 - HERO PRINCIPAL
+   ========================================= */
+
 .hero {
+  --navy: #062b55;
+  --turquoise: #00aebc;
+
+  position: relative;
+  isolation: isolate;
+
   width: 100%;
-  min-height: 100vh;
+  height: calc(100vh - 88px);
+  min-height: 590px;
+  max-height: 720px;
 
   display: flex;
-  justify-content: space-between;
   align-items: center;
 
-  padding: 120px 80px;
+  box-sizing: border-box;
+  overflow: hidden;
 
-  gap: 60px;
+  background: #ffffff;
 }
+
+/* =========================================
+   FONDO PRINCIPAL
+   ========================================= */
+
+.hero-background-image {
+  position: absolute;
+  z-index: -3;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center center;
+
+  opacity: 1;
+}
+
+/* =========================================
+   CAPA PARA MEJORAR LECTURA DEL TEXTO
+   ========================================= */
+
+.hero-background-overlay {
+  position: absolute;
+  z-index: -2;
+
+  inset: 0;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.94) 22%,
+    rgba(255, 255, 255, 0.76) 39%,
+    rgba(255, 255, 255, 0.26) 54%,
+    rgba(255, 255, 255, 0) 72%
+  );
+
+  pointer-events: none;
+}
+
+/* =========================================
+   CONTENIDO
+   ========================================= */
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  max-width: 1500px;
+
+  margin: 0 auto;
+  padding: 0 7%;
+
+  box-sizing: border-box;
+
+  transform: translateY(-35px);
+}
+
+/* =========================================
+   BLOQUE DE TEXTO
+   ========================================= */
 
 .hero-text {
-  flex: 1;
+  width: 760px;
+  max-width: 56%;
 }
+
+/* =========================================
+   ETIQUETA SUPERIOR
+   ========================================= */
+
+.hero-label {
+  width: fit-content;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  margin-bottom: 22px;
+
+  padding: 6px 13px 6px 7px;
+
+  border: 1px solid rgba(0, 174, 188, 0.25);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.88);
+
+  color: #405e77;
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+  line-height: 1;
+
+  box-shadow: 0 5px 20px rgba(6, 43, 85, 0.025);
+}
+
+.hero-label-icon {
+  width: 23px;
+  height: 23px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: var(--turquoise);
+  color: #ffffff;
+}
+
+/* =========================================
+   TITULO PRINCIPAL
+   ========================================= */
 
 .hero-text h1 {
-  font-size: 72px;
-  color: white;
-  margin-bottom: 25px;
-  line-height: 1.2;
+  width: fit-content;
+  max-width: 100%;
+
+  margin: 0;
+
+  color: var(--navy);
+
+  font-size: clamp(42px, 3.45vw, 60px);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -2.4px;
 }
+
+/* PRIMERA LINEA:
+   GESTION FARMACEUTICA */
+
+.hero-text h1 {
+  white-space: nowrap;
+}
+
+/* SEGUNDA LINEA:
+   INTELIGENTE Y SEGURA */
+
+.hero-text h1 span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--navy);
+
+  white-space: nowrap;
+}
+
+/* =========================================
+   DESCRIPCION
+   ========================================= */
 
 .hero-text p {
-  font-size: 24px;
-  color: #dbeafe;
-  line-height: 1.8;
-  margin-bottom: 40px;
-  max-width: 650px;
+  width: fit-content;
+  max-width: 540px;
+
+  margin: 24px 0 27px;
+
+  color: #536d82;
+
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.65;
 }
 
-.hero-buttons {
-  display: flex;
-  gap: 20px;
-}
+/* =========================================
+   BOTON CONOCER MAS
+   ========================================= */
 
-.btn-primary {
-  background: #00aebc;
-  color: white;
-  border: none;
-  padding: 16px 34px;
-  border-radius: 10px;
-  font-size: 17px;
-  cursor: pointer;
-}
+.hero-more-button {
+  min-height: 47px;
 
-.btn-secondary {
-  background: transparent;
-  color: white;
-  border: 2px solid white;
-  padding: 16px 34px;
-  border-radius: 10px;
-  font-size: 17px;
-  cursor: pointer;
-}
-
-.hero-image {
-  flex: 1;
-
-  display: flex;
-  justify-content: center;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 11px;
+
+  padding: 11px 20px;
+
+  border: 1px solid rgba(6, 43, 85, 0.17);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  color: var(--navy);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 24px rgba(6, 43, 85, 0.055);
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.hero-image img {
-  width: 100%;
-  max-width: 620px;
-  border-radius: 18px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+.hero-more-button:hover {
+  transform: translateY(-2px);
+
+  background: #ffffff;
+  border-color: rgba(0, 174, 188, 0.35);
+
+  box-shadow: 0 12px 28px rgba(6, 43, 85, 0.1);
+}
+
+.hero-more-button:active {
+  transform: translateY(0);
+}
+
+/* =========================================
+   INDICADOR INFERIOR
+   ========================================= */
+
+.hero-scroll-indicator {
+  position: absolute;
+  z-index: 3;
+
+  left: 7%;
+  bottom: 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  color: #7890a3;
+
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+}
+
+.hero-scroll-line {
+  width: 45px;
+  height: 1px;
+
+  background: rgba(6, 43, 85, 0.25);
+}
+
+/* =========================================
+   PANTALLAS GRANDES
+   ========================================= */
+
+@media (min-width: 1500px) {
+  .hero-content {
+    max-width: 1600px;
+  }
+
+  .hero-text {
+    width: 800px;
+  }
+
+  .hero-text h1 {
+    font-size: 60px;
+  }
+}
+
+/* =========================================
+   PORTATILES
+   ========================================= */
+
+@media (max-width: 1250px) {
+  .hero-content {
+    padding-left: 6%;
+    padding-right: 6%;
+  }
+
+  .hero-text {
+    width: 650px;
+    max-width: 58%;
+  }
+
+  .hero-text h1 {
+    font-size: clamp(38px, 3.7vw, 52px);
+  }
+
+  .hero-background-image {
+    object-position: 55% center;
+  }
+
+  .hero-scroll-indicator {
+    left: 6%;
+  }
+}
+
+/* =========================================
+   TABLETAS GRANDES
+   ========================================= */
+
+@media (max-width: 1000px) {
+  .hero {
+    height: auto;
+    min-height: 650px;
+    max-height: none;
+
+    align-items: flex-start;
+  }
+
+  .hero-content {
+    padding: 65px 7% 260px;
+  }
+
+  .hero-text {
+    width: 100%;
+    max-width: 650px;
+  }
+
+  .hero-text h1 {
+    font-size: clamp(39px, 5.5vw, 52px);
+  }
+
+  .hero-background-image {
+    object-position: center bottom;
+  }
+
+  .hero-background-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 255, 255, 0.96) 34%,
+      rgba(255, 255, 255, 0.74) 53%,
+      rgba(255, 255, 255, 0.15) 75%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  .hero-scroll-indicator {
+    display: none;
+  }
+}
+
+/* =========================================
+   TABLETAS PEQUENAS
+   ========================================= */
+
+@media (max-width: 750px) {
+  .hero {
+    min-height: 630px;
+  }
+
+  .hero-content {
+    padding: 55px 6% 230px;
+  }
+
+  .hero-text h1 {
+    white-space: normal;
+
+    font-size: clamp(36px, 7vw, 48px);
+  }
+
+  .hero-text h1 span {
+    white-space: normal;
+  }
+
+  .hero-text p {
+    max-width: 480px;
+
+    margin-top: 20px;
+
+    font-size: 14px;
+  }
+}
+
+/* =========================================
+   CELULARES
+   ========================================= */
+
+@media (max-width: 520px) {
+  .hero {
+    min-height: 610px;
+  }
+
+  .hero-content {
+    padding: 42px 22px 215px;
+  }
+
+  .hero-label {
+    margin-bottom: 18px;
+
+    padding: 5px 10px 5px 6px;
+
+    font-size: 7.5px;
+    letter-spacing: 0.7px;
+  }
+
+  .hero-label-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .hero-text h1 {
+    font-size: clamp(34px, 10vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -1.7px;
+  }
+
+  .hero-text p {
+    margin: 18px 0 23px;
+
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .hero-more-button {
+    min-height: 43px;
+
+    padding: 10px 16px;
+
+    font-size: 12px;
+  }
+
+  .hero-background-image {
+    object-position: 57% bottom;
+  }
+}
+
+/* =========================================
+   ACCESIBILIDAD
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero *,
+  .hero *::before,
+  .hero *::after {
+    transition: none !important;
+  }
 }

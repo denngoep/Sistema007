@@ -1,32 +1,58 @@
-import { useNavigate } from "react-router-dom";
+import { ArrowRight, Plus } from "lucide-react";
+
+import heroImage from "../../assets/hero-sistema007-nuevo.png";
 import "./Hero.css";
-import heroImage from "../../assets/hero-sistema007.png";
 
 function Hero() {
-  const navigate = useNavigate();
+  const handleConocerMas = () => {
+    document.getElementById("caracteristicas")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   return (
-    <section className="hero">
-      <div className="hero-text">
-        <h1>Gestión farmacéutica inteligente</h1>
+    <section className="hero" id="inicio">
+      <img
+        src={heroImage}
+        alt=""
+        className="hero-background-image"
+        aria-hidden="true"
+      />
 
-        <p>
-          Plataforma desarrollada para optimizar la dispensación de
-          medicamentos, mejorar la trazabilidad y fortalecer la seguridad del
-          paciente.
-        </p>
+      <div className="hero-background-overlay" />
 
-        <div className="hero-buttons">
-          <button className="btn-primary" onClick={() => navigate("/login")}>
-            Iniciar sesión
+      <div className="hero-content">
+        <div className="hero-text">
+          <div className="hero-label">
+            <span className="hero-label-icon">
+              <Plus size={14} strokeWidth={3} />
+            </span>
+
+            <span>GESTIÓN CLÍNICA Y FARMACÉUTICA</span>
+          </div>
+
+          <h1>
+            Gestión farmacéutica
+            <span> inteligente y segura.</span>
+          </h1>
+
+          <p>Dispensación, inventario y trazabilidad en una sola plataforma.</p>
+
+          <button
+            type="button"
+            className="hero-more-button"
+            onClick={handleConocerMas}
+          >
+            Conocer más
+            <ArrowRight size={18} strokeWidth={2} />
           </button>
-
-          <button className="btn-secondary">Conocer más</button>
         </div>
       </div>
 
-      <div className="hero-image">
-        <img src={heroImage} alt="Sistema007" />
+      <div className="hero-scroll-indicator">
+        <span>Explora Sistema007</span>
+        <div className="hero-scroll-line" />
       </div>
     </section>
   );
