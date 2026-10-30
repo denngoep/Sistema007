@@ -17,6 +17,17 @@ export class MailService {
     destinationEmail: string,
     code: string,
   ): Promise<void> {
+    // Únicamente para pruebas locales
+    if (process.env.NODE_ENV === 'development') {
+      console.log('================================');
+      console.log('RECUPERACIÓN DE CONTRASEÑA - PRUEBAS');
+      console.log(`Usuario: ${destinationEmail}`);
+      console.log(`Código de recuperación: ${code}`);
+      console.log('Vigencia: 10 minutos');
+      console.log('================================');
+      return;
+    }
+
     try {
       await this.transporter.sendMail({
         from: process.env.SMTP_FROM,
