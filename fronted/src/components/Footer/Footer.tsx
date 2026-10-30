@@ -1,24 +1,37 @@
 import "./Footer.css";
 
+import logoSistema007 from "../../assets/logo-sistema007.png";
+
 function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="footer">
       <div className="footer-content">
-        <div className="footer-brand">
-          <h3>Sistema007</h3>
-          <p>Gestión farmacéutica inteligente, segura y trazable.</p>
-        </div>
+        <a className="footer-brand" href="#inicio">
+          <img
+            src={logoSistema007}
+            alt="Símbolo de Sistema007"
+            className="footer-logo"
+          />
 
-        <div className="footer-links">
-          <a href="#">Inicio</a>
+          <div className="footer-brand-info">
+            <span className="footer-brand-name">
+              Sistema<span>007</span>
+            </span>
+          </div>
+        </a>
+
+        <nav className="footer-links" aria-label="Navegación del pie de página">
+          <a href="#inicio">Inicio</a>
           <a href="#caracteristicas">Características</a>
-          <a href="#">Nosotros</a>
-          <a href="#">Contacto</a>
-        </div>
+          <a href="#nosotros">Nosotros</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
       </div>
 
       <div className="footer-bottom">
-        <p>© 2026 Sistema007. Todos los derechos reservados.</p>
+        <p>© {currentYear} Sistema007. Todos los derechos reservados.</p>
       </div>
     </footer>
   );
