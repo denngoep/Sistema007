@@ -1,0 +1,196 @@
+/* =========================================
+   SISTEMA007 - CONTACTO
+   ========================================= */
+
+.contact {
+  --navy: #062b55;
+  --turquoise: #00aebc;
+
+  padding: 48px 7% 50px;
+  background: #f7fbfd;
+
+  scroll-margin-top: 105px;
+}
+
+.contact-container {
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+}
+
+/* ENCABEZADO */
+
+.contact-heading {
+  max-width: 700px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.contact-eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+
+  color: var(--turquoise);
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
+
+.contact-heading h2 {
+  margin: 0;
+
+  color: var(--navy);
+
+  font-size: clamp(30px, 2.5vw, 39px);
+  font-weight: 800;
+  line-height: 1.16;
+  letter-spacing: -1.2px;
+}
+
+.contact-heading p {
+  max-width: 620px;
+  margin: 11px auto 0;
+
+  color: #667d90;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   TRES TARJETAS
+   ========================================= */
+
+.contact-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.contact-card,
+.contact-card:first-child {
+  grid-column: auto;
+
+  min-height: 155px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 0;
+
+  padding: 21px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e1ecf2;
+  border-radius: 15px;
+
+  background: #ffffff;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-3px);
+
+  border-color: rgba(0, 174, 188, 0.3);
+
+  box-shadow: 0 10px 28px rgba(6, 43, 85, 0.055);
+}
+
+/* ICONOS */
+
+.contact-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 15px;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: #e8f8fa;
+  color: var(--turquoise);
+}
+
+/* TEXTO */
+
+.contact-card-text {
+  width: 100%;
+}
+
+.contact-card-text h3 {
+  margin: 0 0 7px;
+
+  color: var(--navy);
+
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.contact-card-text p {
+  margin: 0;
+
+  color: #6c8192;
+
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+  .contact-content {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-card,
+  .contact-card:first-child {
+    min-height: auto;
+  }
+}
+
+/* CELULAR */
+
+@media (max-width: 600px) {
+  .contact {
+    padding: 45px 22px 50px;
+    scroll-margin-top: 90px;
+  }
+
+  .contact-heading {
+    margin-bottom: 25px;
+  }
+
+  .contact-heading h2 {
+    font-size: 30px;
+  }
+
+  .contact-heading p {
+    font-size: 13px;
+  }
+
+  .contact-card,
+  .contact-card:first-child {
+    padding: 20px;
+  }
+}
+
+/* ACCESIBILIDAD */
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-card {
+    transition: none;
+  }
+}
