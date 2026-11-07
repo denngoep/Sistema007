@@ -1,0 +1,16 @@
+services:
+  backend:
+    image: sistema007-backend:latest
+    container_name: sistema007-api
+    env_file:
+      - ./backend/.env.docker
+    ports:
+      - "3000:3000"
+
+  frontend:
+    image: sistema007-frontend:latest
+    container_name: sistema007-frontend-web
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
