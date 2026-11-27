@@ -1,7 +1,8 @@
 import {
   IsEmail,
   IsEnum,
-  IsOptional,
+  ValidateIf,
+  Matches,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -9,21 +10,23 @@ import {
 import { RolUsuario } from '../generated/prisma/enums';
 
 export class UpdateUserDto {
-  @IsOptional()
+  @ValidateIf((_object, value) => value !== undefined)
   @IsString()
+  @Matches(/\S/, { message: 'El nombre no puede estar vacío' })
   nombre?: string;
 
-  @IsOptional()
+  @ValidateIf((_object, value) => value !== undefined)
   @IsEmail({}, { message: 'El correo no es válido' })
   correo?: string;
 
-  @IsOptional()
+  @ValidateIf((_object, value) => value !== undefined)
+  @IsString()
   @MinLength(8, {
     message: 'La contraseña debe tener mínimo 8 caracteres',
   })
   password?: string;
 
-  @IsOptional()
+  @ValidateIf((_object, value) => value !== undefined)
   @IsEnum(RolUsuario, {
     message: 'El rol seleccionado no es válido',
   })
