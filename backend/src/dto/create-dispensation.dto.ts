@@ -26,11 +26,6 @@ export class CreateDispensationDto {
   @Min(1)
   bodegaId!: number;
 
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  usuarioId!: number;
-
   @IsOptional()
   @IsString()
   observaciones?: string;
