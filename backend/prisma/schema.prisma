@@ -53,6 +53,32 @@ enum EstadoLoteInventario {
 enum TipoProductoInventario {
   MEDICAMENTO
   INSUMO
+  DISPOSITIVO_MEDICO
+}
+
+enum CondicionConservacion {
+  AMBIENTE
+  CADENA_FRIO
+  OTRA
+}
+
+enum TipoBodega {
+  GENERAL
+  SATELITE
+  NO_CONFORMES
+}
+
+enum EstadoVerificacionInvima {
+  PENDIENTE
+  VIGENTE
+  NO_VIGENTE
+  NO_APLICA
+}
+
+enum ResultadoVerificacionIngreso {
+  PENDIENTE
+  CONFORME
+  NO_CONFORME
 }
 
 enum EstadoActaRecepcion {
@@ -61,6 +87,24 @@ enum EstadoActaRecepcion {
   APROBADA
   RECHAZADA
   ANULADA
+}
+
+enum EstadoGestionNoConforme {
+  PENDIENTE
+  EN_CUSTODIA
+  DEVUELTO_PROVEEDOR
+  REINTEGRADO
+}
+
+enum OrigenGestionNoConforme {
+  RECEPCION
+  ALMACENAMIENTO
+  VENCIMIENTO
+}
+
+enum TipoDisposicionNoConforme {
+  DEVOLUCION_PROVEEDOR
+  CAMBIO_FISICO
 }
 
 enum EstadoIngresoInventario {
@@ -75,6 +119,7 @@ enum TipoMovimientoInventario {
   AJUSTE_ENTRADA
   AJUSTE_SALIDA
   DISPENSACION
+  DEVOLUCION_PROVEEDOR
 }
 
 enum EstadoDispensacion {
@@ -83,11 +128,27 @@ enum EstadoDispensacion {
   ANULADA
 }
 
-// HU-027: modalidad utilizada para dejar evidencia
-// de la recepción de los medicamentos.
 enum TipoFirmaDispensacion {
   DIGITAL
   MANUAL
+}
+
+enum TipoCambioVerificacionRecepcion {
+  REEVALUACION
+  CORRECCION_DOCUMENTAL
+}
+
+model Servicio {
+  id        Int      @id @default(autoincrement())
+  codigo    String   @unique
+  nombre    String
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuarios Usuario[]
+
+  @@map("servicios")
 }
 
 model Usuario {
@@ -100,6 +161,10 @@ model Usuario {
   intentosFallidos Int        @default(0)
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
+  servicioId       Int?
+  esCoordinador    Boolean    @default(false)
+
+  servicio Servicio? @relation(fields: [servicioId], references: [id], onDelete: Restrict)
 
   atencionesClinicas AtencionClinica[]
 
@@ -110,12 +175,24 @@ model Usuario {
 
   ingresosInventario IngresoInventario[] @relation("IngresoConfirmadoPor")
 
-  movimientosInventario MovimientoInventario[]
+  movimientosInventario          MovimientoInventario[]
+  documentosInventario           DocumentoInventario[]                 @relation("DocumentoInventarioCreadoPor")
+  documentosMovimientoInventario DocumentoMovimientoInventario[]       @relation("DocumentoMovimientoInventarioRegistradoPor")
+  documentosActaRecepcion        DocumentoActaRecepcion[]              @relation("DocumentoActaRecepcionRegistradoPor")
+  documentosCorreccionRecepcion  DocumentoCorreccionDetalleRecepcion[] @relation("DocumentoCorreccionDetalleRecepcionRegistradoPor")
 
   recuperacionesPassword RecuperacionPassword[]
 
-  dispensaciones Dispensacion[] @relation("DispensacionRealizadaPor")
+  dispensaciones         Dispensacion[]          @relation("DispensacionRealizadaPor")
+  documentosDispensacion DocumentoDispensacion[]
+  soportesDispensacion   SoporteDispensacion[]
 
+  gestionesNoConformes   GestionNoConforme[]
+  reevaluacionesTecnicas ReevaluacionTecnicaRecepcion[]
+
+  correccionesRecepcion CorreccionDetalleRecepcion[]
+
+  @@index([servicioId])
   @@map("usuarios")
 }
 
@@ -298,18 +375,25 @@ model Medicamento {
 }
 
 model ProductoInventario {
-  id             Int                      @id @default(autoincrement())
+  id             Int                    @id @default(autoincrement())
   medicamentoId  Int?
-  codigoInterno  Int?                     @unique
-  codigoBarras   String?                  @unique
+  codigoInterno  Int?                   @unique
+  codigoBarras   String?                @unique
   tipo           TipoProductoInventario
   descripcion    String
   marca          String?
   laboratorio    String?
   registroInvima String?
-  estado         EstadoProductoInventario @default(ACTIVO)
-  createdAt      DateTime                 @default(now())
-  updatedAt      DateTime                 @updatedAt
+
+  condicionConservacion CondicionConservacion @default(AMBIENTE)
+  temperaturaMinima     Float?
+  temperaturaMaxima     Float?
+  humedadMaxima         Float?
+  claseRiesgo           String?
+
+  estado    EstadoProductoInventario @default(ACTIVO)
+  createdAt DateTime                 @default(now())
+  updatedAt DateTime                 @updatedAt
 
   medicamento Medicamento? @relation(fields: [medicamentoId], references: [id])
 
@@ -344,6 +428,8 @@ model LoteInventario {
 
   detallesDispensacion DetalleDispensacion[]
 
+  gestionesNoConformes GestionNoConforme[]
+
   @@unique([productoInventarioId, numeroLote])
   @@map("lotes_inventario")
 }
@@ -367,15 +453,17 @@ model Sede {
 }
 
 model Bodega {
-  id                  Int      @id @default(autoincrement())
+  id                  Int        @id @default(autoincrement())
   sedeId              Int
+  codigo              String?    @unique
   nombre              String
+  tipo                TipoBodega @default(GENERAL)
   descripcion         String?
-  permiteDispensacion Boolean  @default(false)
-  activa              Boolean  @default(true)
+  permiteDispensacion Boolean    @default(false)
+  activa              Boolean    @default(true)
   creadoPorId         Int?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 
   sede Sede @relation(fields: [sedeId], references: [id])
 
@@ -385,11 +473,17 @@ model Bodega {
 
   ingresosDestino IngresoInventario[]
 
+  actasRecepcionDestino ActaRecepcion[] @relation("ActaBodegaDestino")
+
   movimientosOrigen MovimientoInventario[] @relation("MovimientoBodegaOrigen")
 
   movimientosDestino MovimientoInventario[] @relation("MovimientoBodegaDestino")
 
   dispensaciones Dispensacion[]
+
+  gestionesNoConformes GestionNoConforme[] @relation("GestionBodegaCustodia")
+
+  gestionesNoConformesOrigen GestionNoConforme[] @relation("GestionBodegaOrigen")
 
   @@unique([sedeId, nombre])
   @@index([sedeId])
@@ -418,6 +512,7 @@ model ActaRecepcion {
   id                Int                 @id @default(autoincrement())
   numeroActa        String              @unique
   sedeId            Int
+  bodegaDestinoId   Int?
   proveedorId       Int
   elaboradoPorId    Int
   revisadoPorId     Int?
@@ -435,6 +530,8 @@ model ActaRecepcion {
 
   sede Sede @relation(fields: [sedeId], references: [id])
 
+  bodegaDestino Bodega? @relation("ActaBodegaDestino", fields: [bodegaDestinoId], references: [id])
+
   proveedor Proveedor @relation(fields: [proveedorId], references: [id])
 
   elaboradoPor Usuario @relation("ActaElaboradaPor", fields: [elaboradoPorId], references: [id])
@@ -445,7 +542,10 @@ model ActaRecepcion {
 
   ingresoInventario IngresoInventario?
 
+  documentos DocumentoActaRecepcion[]
+
   @@index([sedeId])
+  @@index([bodegaDestinoId])
   @@index([proveedorId])
   @@index([elaboradoPorId])
   @@index([revisadoPorId])
@@ -460,9 +560,15 @@ model DetalleActaRecepcion {
   fechaVencimiento DateTime
   cantidadRecibida Int
   registroInvima   String?
-  observaciones    String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+
+  estadoVerificacionInvima EstadoVerificacionInvima     @default(PENDIENTE)
+  temperaturaRegistrada    Float?
+  humedadRegistrada        Float?
+  resultadoVerificacion    ResultadoVerificacionIngreso @default(PENDIENTE)
+
+  observaciones String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   actaRecepcion ActaRecepcion @relation(fields: [actaRecepcionId], references: [id], onDelete: Cascade)
 
@@ -470,9 +576,50 @@ model DetalleActaRecepcion {
 
   detalleIngreso DetalleIngresoInventario?
 
+  gestionNoConforme      GestionNoConforme?
+  reevaluacionesTecnicas ReevaluacionTecnicaRecepcion[]
+
+  correcciones CorreccionDetalleRecepcion[]
+
   @@index([actaRecepcionId])
   @@index([productoId])
   @@map("detalles_acta_recepcion")
+}
+
+model GestionNoConforme {
+  id                     Int                        @id @default(autoincrement())
+  detalleActaRecepcionId Int?                       @unique
+  loteId                 Int?
+  bodegaOrigenId         Int?
+  bodegaId               Int?
+  cantidad               Int
+  origen                 OrigenGestionNoConforme    @default(RECEPCION)
+  estado                 EstadoGestionNoConforme    @default(PENDIENTE)
+  motivo                 String?
+  disposicion            TipoDisposicionNoConforme?
+  observaciones          String?
+  fechaIngresoCustodia   DateTime?
+  fechaCierre            DateTime?
+  responsableId          Int?
+  createdAt              DateTime                   @default(now())
+  updatedAt              DateTime                   @updatedAt
+
+  detalleActaRecepcion DetalleActaRecepcion? @relation(fields: [detalleActaRecepcionId], references: [id])
+
+  lote LoteInventario? @relation(fields: [loteId], references: [id])
+
+  bodegaOrigen Bodega? @relation("GestionBodegaOrigen", fields: [bodegaOrigenId], references: [id])
+
+  bodega Bodega? @relation("GestionBodegaCustodia", fields: [bodegaId], references: [id])
+
+  responsable Usuario? @relation(fields: [responsableId], references: [id])
+
+  @@index([loteId])
+  @@index([bodegaOrigenId])
+  @@index([bodegaId])
+  @@index([estado])
+  @@index([origen])
+  @@map("gestiones_no_conformes")
 }
 
 model IngresoInventario {
@@ -567,6 +714,8 @@ model MovimientoInventario {
 
   dispensacion Dispensacion? @relation(fields: [dispensacionId], references: [id])
 
+  documentos DocumentoMovimientoInventario[]
+
   @@index([loteId])
   @@index([bodegaOrigenId])
   @@index([bodegaDestinoId])
@@ -576,25 +725,114 @@ model MovimientoInventario {
   @@map("movimientos_inventario")
 }
 
+// Archivos privados del módulo de inventario. El contenido se guarda fuera de
+// la carpeta pública; aquí solo permanecen metadatos e integridad.
+model DocumentoInventario {
+  id                  Int      @id @default(autoincrement())
+  claveAlmacenamiento String   @unique(map: "documentos_inventario_claveAlmacenamiento_key") @db.VarChar(80)
+  sha256              String   @db.Char(64)
+  mime                String   @db.VarChar(64)
+  tamano              Int
+  creadoAt            DateTime @default(now())
+  creadoPorId         Int
+  versionPlantilla    String?  @db.VarChar(32)
+
+  creadoPor    Usuario                               @relation("DocumentoInventarioCreadoPor", fields: [creadoPorId], references: [id], onDelete: Restrict, map: "documentos_inventario_creadoPorId_fkey")
+  movimientos  DocumentoMovimientoInventario[]
+  actas        DocumentoActaRecepcion[]
+  correcciones DocumentoCorreccionDetalleRecepcion[]
+
+  @@index([creadoPorId], map: "documentos_inventario_creadoPorId_idx")
+  @@map("documentos_inventario")
+}
+
+// Versiones inmutables de comprobantes y anexos de cada movimiento.
+model DocumentoMovimientoInventario {
+  id                     Int      @id @default(autoincrement())
+  movimientoInventarioId Int
+  documentoInventarioId  Int
+  proposito              String   @db.VarChar(32)
+  version                Int      @default(1)
+  datosComprobante       Json?
+  motivoCorreccion       String?  @db.Text
+  registradoAt           DateTime @default(now())
+  registradoPorId        Int
+
+  movimientoInventario MovimientoInventario @relation(fields: [movimientoInventarioId], references: [id], onDelete: Restrict, map: "fk_dmi_movimiento")
+  documentoInventario  DocumentoInventario  @relation(fields: [documentoInventarioId], references: [id], onDelete: Restrict, map: "fk_dmi_documento")
+  registradoPor        Usuario              @relation("DocumentoMovimientoInventarioRegistradoPor", fields: [registradoPorId], references: [id], onDelete: Restrict, map: "fk_dmi_registrado")
+
+  @@unique([movimientoInventarioId, proposito, version], map: "uq_dmi_mov_prop_ver")
+  @@index([movimientoInventarioId, proposito], map: "idx_dmi_mov_prop")
+  @@index([documentoInventarioId], map: "idx_dmi_documento")
+  @@index([registradoPorId], map: "idx_dmi_registrado")
+  @@map("documentos_movimiento_inventario")
+}
+
+// Facturas y anexos de recepción; las versiones no sustituyen el original.
+model DocumentoActaRecepcion {
+  id                    Int      @id @default(autoincrement())
+  actaRecepcionId       Int
+  documentoInventarioId Int
+  proposito             String   @db.VarChar(32)
+  version               Int      @default(1)
+  registradoAt          DateTime @default(now())
+  registradoPorId       Int
+
+  actaRecepcion       ActaRecepcion       @relation(fields: [actaRecepcionId], references: [id], onDelete: Restrict, map: "fk_dar_acta")
+  documentoInventario DocumentoInventario @relation(fields: [documentoInventarioId], references: [id], onDelete: Restrict, map: "fk_dar_documento")
+  registradoPor       Usuario             @relation("DocumentoActaRecepcionRegistradoPor", fields: [registradoPorId], references: [id], onDelete: Restrict, map: "fk_dar_registrado")
+
+  @@unique([actaRecepcionId, proposito, version], map: "uq_dar_act_prop_ver")
+  @@index([actaRecepcionId, proposito], map: "idx_dar_act_prop")
+  @@index([documentoInventarioId], map: "idx_dar_documento")
+  @@index([registradoPorId], map: "idx_dar_registrado")
+  @@map("documentos_acta_recepcion")
+}
+
+// Soportes privados y versionados de una corrección concreta. No sustituye la
+// referencia textual de la corrección ni modifica documentos históricos.
+model DocumentoCorreccionDetalleRecepcion {
+  id                           Int      @id @default(autoincrement())
+  correccionDetalleRecepcionId Int
+  documentoInventarioId        Int
+  proposito                    String   @db.VarChar(32)
+  version                      Int      @default(1)
+  registradoAt                 DateTime @default(now())
+  registradoPorId              Int
+
+  correccionDetalleRecepcion CorreccionDetalleRecepcion @relation(fields: [correccionDetalleRecepcionId], references: [id], onDelete: Restrict, map: "fk_dcr_corr")
+  documentoInventario        DocumentoInventario        @relation(fields: [documentoInventarioId], references: [id], onDelete: Restrict, map: "fk_dcr_doc")
+  registradoPor              Usuario                    @relation("DocumentoCorreccionDetalleRecepcionRegistradoPor", fields: [registradoPorId], references: [id], onDelete: Restrict, map: "fk_dcr_reg")
+
+  @@unique([correccionDetalleRecepcionId, proposito, version], map: "uq_dcr_corr_prop_ver")
+  @@index([correccionDetalleRecepcionId, proposito], map: "idx_dcr_corr_prop")
+  @@index([documentoInventarioId], map: "idx_dcr_doc")
+  @@index([registradoPorId], map: "idx_dcr_reg")
+  @@map("documentos_correccion_detalle_recepcion")
+}
+
 model Dispensacion {
-  id                 Int                @id @default(autoincrement())
-  numeroDispensacion String             @unique
+  claveIdempotencia  String?                 @unique @db.VarChar(64)
+  hashSolicitud      String?                 @db.Char(64)
+  datosComprobante   Json?
+  versionDocumental  Int                     @default(0)
+  documentos         DocumentoDispensacion[]
+  soportes           SoporteDispensacion[]
+  id                 Int                     @id @default(autoincrement())
+  numeroDispensacion String                  @unique
   pacienteId         Int
   bodegaId           Int
   dispensadoPorId    Int
   periodoAnio        Int
   periodoMes         Int
-  fechaDispensacion  DateTime           @default(now())
-  estado             EstadoDispensacion @default(PENDIENTE)
+  fechaDispensacion  DateTime                @default(now())
+  estado             EstadoDispensacion      @default(PENDIENTE)
   observaciones      String?
 
-  // HU-026: comprobante de dispensación.
   numeroComprobante String?   @unique
   fechaComprobante  DateTime?
 
-  // HU-027: evidencia de recepción del paciente.
-  // DIGITAL: firma capturada directamente desde el sistema.
-  // MANUAL: comprobante impreso, firmado físicamente y cargado después.
   tipoFirma         TipoFirmaDispensacion?
   firmaPaciente     String?
   soporteFirmado    String?
@@ -643,16 +881,127 @@ model DetalleDispensacion {
 }
 
 model RecuperacionPassword {
-  id                 Int       @id @default(autoincrement())
-  usuarioId          Int
-  codigoHash         String
-  fechaExpiracion    DateTime
-  intentosFallidos   Int       @default(0)
-  utilizado          Boolean   @default(false)
-  createdAt          DateTime  @default(now())
+  id               Int      @id @default(autoincrement())
+  usuarioId        Int
+  codigoHash       String
+  fechaExpiracion  DateTime
+  intentosFallidos Int      @default(0)
+  utilizado        Boolean  @default(false)
+  createdAt        DateTime @default(now())
 
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([usuarioId, createdAt])
   @@map("recuperaciones_password")
+}
+
+model ReevaluacionTecnicaRecepcion {
+  id                     Int @id @default(autoincrement())
+  detalleActaRecepcionId Int
+  responsableId          Int
+
+  resultadoAnterior ResultadoVerificacionIngreso
+  resultadoNuevo    ResultadoVerificacionIngreso
+
+  estadoInvimaAnterior EstadoVerificacionInvima
+  estadoInvimaNuevo    EstadoVerificacionInvima
+
+  motivo        String
+  referencia    String
+  observaciones String?
+
+  tipoCambio TipoCambioVerificacionRecepcion @default(REEVALUACION)
+
+  temperaturaAnterior     Float?
+  temperaturaNueva        Float?
+  humedadAnterior         Float?
+  humedadNueva            Float?
+  observacionesAnteriores String?
+  observacionesNuevas     String?
+
+  fechaReevaluacion DateTime @default(now())
+
+  detalleActaRecepcion DetalleActaRecepcion @relation(fields: [detalleActaRecepcionId], references: [id])
+  responsable          Usuario              @relation(fields: [responsableId], references: [id])
+
+  @@index([detalleActaRecepcionId])
+  @@index([responsableId])
+  @@map("reevaluaciones_tecnicas_recepcion")
+}
+
+model CorreccionDetalleRecepcion {
+  id                     Int @id @default(autoincrement())
+  detalleActaRecepcionId Int
+  responsableId          Int
+
+  numeroLoteAnterior String
+  numeroLoteNuevo    String
+
+  fechaVencimientoAnterior DateTime
+  fechaVencimientoNueva    DateTime
+
+  cantidadRecibidaAnterior Int
+  cantidadRecibidaNueva    Int
+
+  motivo     String
+  referencia String
+
+  fechaCorreccion DateTime @default(now())
+
+  detalleActaRecepcion DetalleActaRecepcion                  @relation(fields: [detalleActaRecepcionId], references: [id])
+  responsable          Usuario                               @relation(fields: [responsableId], references: [id])
+  documentos           DocumentoCorreccionDetalleRecepcion[]
+
+  @@index([detalleActaRecepcionId])
+  @@index([responsableId])
+  @@map("correcciones_detalle_recepcion")
+}
+
+model DocumentoDispensacion {
+  id                  Int                   @id @default(autoincrement())
+  dispensacionId      Int
+  proposito           String                @db.VarChar(32)
+  claveAlmacenamiento String                @unique @db.VarChar(80)
+  sha256              String                @db.Char(64)
+  mime                String                @db.VarChar(64)
+  tamano              Int
+  creadoAt            DateTime              @default(now())
+  creadoPorId         Int
+  versionPlantilla    String?               @db.VarChar(32)
+  dispensacion        Dispensacion          @relation(fields: [dispensacionId], references: [id], onDelete: Restrict)
+  creadoPor           Usuario               @relation(fields: [creadoPorId], references: [id], onDelete: Restrict)
+  bases               SoporteDispensacion[] @relation("DocumentoBase")
+  firmados            SoporteDispensacion[] @relation("DocumentoFirmado")
+  firmas              SoporteDispensacion[] @relation("ImagenFirma")
+
+  @@index([dispensacionId, proposito])
+  @@map("documentos_dispensacion")
+}
+
+model SoporteDispensacion {
+  id                      Int                    @id @default(autoincrement())
+  dispensacionId          Int
+  version                 Int
+  modalidad               TipoFirmaDispensacion
+  tipoReceptor            String                 @db.VarChar(32)
+  nombreReceptor          String
+  tipoDocumentoReceptor   String                 @db.VarChar(32)
+  numeroDocumentoReceptor String
+  relacionReceptor        String?
+  constanciaAutorizacion  String?                @db.Text
+  fechaFirma              DateTime
+  registradoAt            DateTime               @default(now())
+  registradoPorId         Int
+  motivoCorreccion        String?                @db.Text
+  documentoBaseId         Int
+  documentoFirmadoId      Int                    @unique
+  imagenFirmaId           Int?                   @unique
+  dispensacion            Dispensacion           @relation(fields: [dispensacionId], references: [id], onDelete: Restrict)
+  registradoPor           Usuario                @relation(fields: [registradoPorId], references: [id], onDelete: Restrict)
+  documentoBase           DocumentoDispensacion  @relation("DocumentoBase", fields: [documentoBaseId], references: [id], onDelete: Restrict)
+  documentoFirmado        DocumentoDispensacion  @relation("DocumentoFirmado", fields: [documentoFirmadoId], references: [id], onDelete: Restrict)
+  imagenFirma             DocumentoDispensacion? @relation("ImagenFirma", fields: [imagenFirmaId], references: [id], onDelete: Restrict)
+
+  @@unique([dispensacionId, version])
+  @@map("soportes_dispensacion")
 }
