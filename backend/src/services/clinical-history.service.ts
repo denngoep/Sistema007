@@ -1,5 +1,7 @@
+import type { Prisma } from '../generated/prisma/client';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -32,18 +34,25 @@ export class ClinicalHistoryService {
 
   async createClinicalAttention(
     createClinicalAttentionDto: CreateClinicalAttentionDto,
+    profesionalId: number,
+    tx?: Prisma.TransactionClient,
   ) {
     const {
       pacienteId,
-      profesionalId,
       motivoConsulta,
       evolucion,
       diagnostico,
       observaciones,
     } = createClinicalAttentionDto;
 
+    if (!Number.isSafeInteger(profesionalId) || profesionalId <= 0) {
+      throw new ForbiddenException(
+        'No se pudo identificar al profesional autenticado',
+      );
+    }
+
     const clinicalHistory =
-      await this.clinicalHistoryRepository.findByPatientId(pacienteId);
+      await this.clinicalHistoryRepository.findByPatientId(pacienteId, tx);
 
     if (!clinicalHistory) {
       throw new NotFoundException('Paciente no encontrado');
@@ -55,20 +64,29 @@ export class ClinicalHistoryService {
       );
     }
 
+    if (!clinicalHistory.paciente.activo) {
+      throw new BadRequestException('El paciente se encuentra inactivo');
+    }
+
     const professional =
-      await this.clinicalHistoryRepository.findProfessionalById(profesionalId);
+      await this.clinicalHistoryRepository.findProfessionalById(
+        profesionalId,
+        tx,
+      );
 
     if (!professional) {
       throw new NotFoundException('Profesional no encontrado');
     }
 
-    if (!professional.activo) {
-      throw new BadRequestException('El profesional se encuentra inactivo');
+    if (!professional.activo || professional.rol !== 'MEDICO') {
+      throw new ForbiddenException(
+        'El profesional debe estar activo y autorizado como médico',
+      );
     }
 
     // Buscar la última atención clínica registrada.
     const lastAttention =
-      await this.clinicalHistoryRepository.findLastClinicalAttention();
+      await this.clinicalHistoryRepository.findLastClinicalAttention(tx);
 
     let nextAdmissionNumber = 1;
 
@@ -104,6 +122,7 @@ export class ClinicalHistoryService {
     const existingAttention =
       await this.clinicalHistoryRepository.findAttentionByAdmissionNumber(
         numeroIngreso,
+        tx,
       );
 
     if (existingAttention) {
@@ -121,6 +140,7 @@ export class ClinicalHistoryService {
         evolucion,
         diagnostico,
         observaciones,
+        tx,
       );
 
     return {

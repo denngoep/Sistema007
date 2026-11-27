@@ -1,3 +1,4 @@
+import type { Prisma } from '../generated/prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -5,8 +6,14 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ClinicalHistoryRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByPatientId(pacienteId: number) {
-    const paciente = await this.prisma.paciente.findUnique({
+  transaction<T>(
+    work: (tx: Prisma.TransactionClient) => Promise<T>,
+  ): Promise<T> {
+    return this.prisma.$transaction(work, { isolationLevel: 'Serializable' });
+  }
+
+  async findByPatientId(pacienteId: number, tx?: Prisma.TransactionClient) {
+    const paciente = await (tx ?? this.prisma).paciente.findUnique({
       where: {
         id: pacienteId,
       },
@@ -21,6 +28,37 @@ export class ClinicalHistoryRepository {
                     nombre: true,
                     rol: true,
                   },
+                },
+                diagnosticosPaciente: {
+                  select: {
+                    id: true,
+                    codigoCie10: true,
+                    nombre: true,
+                    tipo: true,
+                    observaciones: true,
+                  },
+                },
+                formulaciones: {
+                  include: {
+                    diagnosticoPaciente: {
+                      select: { codigoCie10: true, nombre: true },
+                    },
+                    medicamentos: {
+                      select: {
+                        id: true,
+                        medicamento: true,
+                        concentracion: true,
+                        formaFarmaceutica: true,
+                        dosis: true,
+                        frecuencia: true,
+                        duracion: true,
+                        cantidad: true,
+                        viaAdministracion: true,
+                        observaciones: true,
+                      },
+                    },
+                  },
+                  orderBy: { fechaFormulacion: 'desc' },
                 },
               },
               orderBy: {
@@ -60,8 +98,9 @@ export class ClinicalHistoryRepository {
     evolucion?: string,
     diagnostico?: string,
     observaciones?: string,
+    tx?: Prisma.TransactionClient,
   ) {
-    return this.prisma.atencionClinica.create({
+    return (tx ?? this.prisma).atencionClinica.create({
       data: {
         historiaClinicaId,
         profesionalId,
@@ -83,8 +122,11 @@ export class ClinicalHistoryRepository {
     });
   }
 
-  async findProfessionalById(profesionalId: number) {
-    return this.prisma.usuario.findUnique({
+  async findProfessionalById(
+    profesionalId: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    return (tx ?? this.prisma).usuario.findUnique({
       where: {
         id: profesionalId,
       },
@@ -97,16 +139,19 @@ export class ClinicalHistoryRepository {
     });
   }
 
-  async findAttentionByAdmissionNumber(numeroIngreso: string) {
-    return this.prisma.atencionClinica.findUnique({
+  async findAttentionByAdmissionNumber(
+    numeroIngreso: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    return (tx ?? this.prisma).atencionClinica.findUnique({
       where: {
         numeroIngreso,
       },
     });
   }
 
-  async findLastClinicalAttention() {
-    return this.prisma.atencionClinica.findFirst({
+  async findLastClinicalAttention(tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).atencionClinica.findFirst({
       orderBy: {
         id: 'desc',
       },

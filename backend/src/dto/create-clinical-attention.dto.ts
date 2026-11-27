@@ -1,25 +1,21 @@
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator';
 
 export class CreateClinicalAttentionDto {
   @IsInt()
   @Min(1)
   pacienteId!: number;
 
-  @IsInt()
-  @Min(1)
-  profesionalId!: number;
-
-  @IsOptional()
   @IsString()
-  motivoConsulta?: string;
+  @Matches(/\S/, { message: 'El motivo de consulta es obligatorio' })
+  motivoConsulta!: string;
 
-  @IsOptional()
   @IsString()
-  evolucion?: string;
+  @Matches(/\S/, { message: 'La evolución es obligatoria' })
+  evolucion!: string;
 
-  @IsOptional()
   @IsString()
-  diagnostico?: string;
+  @Matches(/\S/, { message: 'El diagnóstico es obligatorio' })
+  diagnostico!: string;
 
   @IsOptional()
   @IsString()
