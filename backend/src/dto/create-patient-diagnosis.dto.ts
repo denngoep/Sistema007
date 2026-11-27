@@ -9,16 +9,7 @@ import {
 
 import { TipoDiagnostico } from '../generated/prisma/enums';
 
-export class CreatePatientDiagnosisDto {
-  @IsInt()
-  @Min(1)
-  pacienteId!: number;
-
-  @IsInt()
-  @Min(1)
-  @IsOptional()
-  atencionClinicaId?: number;
-
+export class CreatePatientDiagnosisContentDto {
   @IsString()
   nombre!: string;
 
@@ -36,4 +27,15 @@ export class CreatePatientDiagnosisDto {
   @IsString()
   @IsOptional()
   observaciones?: string;
+}
+
+export class CreatePatientDiagnosisDto extends CreatePatientDiagnosisContentDto {
+  @IsInt()
+  @Min(1)
+  pacienteId!: number;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  atencionClinicaId?: number;
 }
