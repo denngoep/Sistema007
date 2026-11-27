@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
 /* =========================================
    SISTEMA007 - ESTILOS GLOBALES
    ========================================= */
@@ -9,15 +11,46 @@
 }
 
 html {
+  --s007-page: #f5f8fb;
+  --s007-surface: #ffffff;
+  --s007-surface-raised: #fbfdff;
+  --s007-control: #ffffff;
+  --s007-text: #17324d;
+  --s007-heading: #062b55;
+  --s007-muted: #526f85;
+  --s007-border: #dce7ee;
+  --s007-border-strong: #b8ccd9;
+  --s007-focus: #00aebc;
+  --s007-shadow: 0 8px 24px rgba(6, 43, 85, 0.08);
   scroll-behavior: smooth;
+}
+
+html[data-theme="dark"] {
+  --s007-page: #172b40;
+  --s007-header: #1b3148;
+  --s007-surface: #223b53;
+  --s007-surface-raised: #263f58;
+  --s007-control: #29445e;
+  --s007-table-header: #2b465f;
+  --s007-text: #e5f0f5;
+  --s007-heading: #f1f5f9;
+  --s007-muted: #b8cadb;
+  --s007-border: #527087;
+  --s007-border-strong: #6d8ba1;
+  --s007-focus: #39cbd5;
+  --s007-shadow: 0 10px 28px rgba(4, 19, 33, 0.24);
+  color-scheme: dark;
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #ffffff;
-  color: #062b55;
+  font-family: "Manrope", "Segoe UI", Arial, sans-serif;
+  background: var(--s007-page);
+  color: var(--s007-text);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
 }
 
 #root {
@@ -32,6 +65,22 @@ textarea {
   font-family: inherit;
 }
 
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--s007-focus) 45%, transparent);
+  outline-offset: 2px;
+}
+
 button {
   cursor: pointer;
 }
@@ -43,4 +92,53 @@ img {
 
 a {
   text-decoration: none;
+}
+
+html[data-theme="dark"] :is(.module-workspace, .users-page, .patients-page, .clinical-history-page, .clinical-histories-page, .inventory-page, .reports-page, .dispensation-documents, .dispensations-page, .dashboard, .dashboard-container, .modal-content, .modal) { color: var(--s007-text); }
+html[data-theme="dark"] :is(.card, .users-card, .patients-card, .inventory-card, .inventory-section, .dispensation-documents, .dispensation-documents__detail, .dispensation-documents__detail-header, .dispensation-documents__form-area, .dispensation-documents__search, .dispensation-documents__report-summary > div, .dispensation-documents__detail-summary > div, .modal-content) { background: var(--s007-surface) !important; border-color: var(--s007-border) !important; }
+html[data-theme="dark"] :is(input, select, textarea) { background: var(--s007-control) !important; color: var(--s007-text) !important; border-color: var(--s007-border) !important; }
+
+.public-theme-toggle { position: fixed; top: 18px; right: 20px; z-index: 20; }
+html[data-theme="dark"] :is(.login-page,.recovery-page) { background: var(--s007-page); color: var(--s007-heading); }
+html[data-theme="dark"] :is(.login-card,.recovery-card) { background: var(--s007-surface); border-color: var(--s007-border); box-shadow: none; }
+html[data-theme="dark"] :is(.login-identity h1,.login-form-header h2,.recovery-brand h1,.recovery-header h2) { color: #f1f5f9; }
+html[data-theme="dark"] :is(.login-identity p,.login-form-header p,.recovery-brand p,.recovery-header p,.login-footer) { color: #94a3b8; }
+html[data-theme="dark"] :is(.login-field label,.recovery-form label) { color: #d8e3eb; }
+html[data-theme="dark"] :is(.login-field input,.recovery-form input) { background: var(--s007-control) !important; color: var(--s007-heading) !important; border-color: var(--s007-border) !important; }
+html[data-theme="dark"] :is(.login-footer,.recovery-footer) { background: var(--s007-page); border-color: var(--s007-border); }
+
+/* Superficies compartidas de los módulos internos. Se limita al área de
+   trabajo autenticada para no afectar documentos ni componentes externos. */
+html[data-theme="dark"] .module-workspace__content :is(h1,h2,h3,h4,h5,th) { color: #f1f5f9; }
+html[data-theme="dark"] .module-workspace__content :is(p,small,label,[class*="subtitle"],[class*="description"]) { color: var(--s007-muted); }
+html[data-theme="dark"] .module-workspace__content :is([class*="table-container"],[class*="table-wrap"],[class*="-card"],[class*="-modal"],[class*="modal-"]) { border-color: var(--s007-border); }
+html[data-theme="dark"] .module-workspace__content :is([class*="table-container"],[class*="table-wrap"],[class*="-card"],[class*="-modal"],[class*="modal-"]) { background-color: var(--s007-surface); }
+html[data-theme="dark"] .module-workspace__content :is(table thead,table th) { background: var(--s007-table-header); border-color: var(--s007-border); }
+html[data-theme="dark"] .module-workspace__content :is(table td,table tr) { border-color: var(--s007-border); color: #d8e3eb; }
+html[data-theme="dark"] .module-workspace__content :is(select option) { background: var(--s007-control); color: var(--s007-heading); }
+html[data-theme="dark"] .module-workspace__content :is([class*="alert"],[class*="message"],[class*="empty"],[class*="notice"]) { border-color: var(--s007-border); }
+html[data-theme="dark"] .module-workspace__content :is([class*="secondary"],[class*="cancel"],[class*="back-button"],[class*="pagination"] button) { background: var(--s007-control); color: #f1f5f9; border-color: var(--s007-border); }
+
+/* Densidad compartida: conserva una tipografía legible a 100 % sin forzar
+   alturas o anchos que expulsen acciones fuera del área operativa. */
+.module-workspace__content :is(input, select, button):not(.theme-toggle) {
+  min-height: 38px;
+}
+
+@media (max-width: 760px) {
+  body { font-size: 14px; }
+  .module-workspace__content { padding: 14px 12px 20px; }
+  .module-workspace__content :is(input, select, button):not(.theme-toggle) {
+    min-height: 38px;
+  }
+
+  .module-workspace__content :is([class*="table-container"], [class*="table-wrap"], [class*="table-scroll"]) {
+    max-width: 100%;
+    overscroll-behavior-inline: contain;
+  }
+
+  .module-workspace__content [role="dialog"] {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
 }
