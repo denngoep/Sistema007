@@ -145,6 +145,11 @@
   color: #9aa8b3;
 }
 
+.patients-search-container select { margin: 12px 10px 0 0; }
+.table-pagination { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 18px; }
+.table-pagination button { padding: 8px 12px; border: 1px solid #d6e1e8; border-radius: 7px; background: #fff; color: #062b55; cursor: pointer; }
+.table-pagination button:disabled { opacity: .5; cursor: not-allowed; }
+
 .patients-message {
   margin-top: 20px;
   padding: 15px 18px;
@@ -187,7 +192,7 @@
 
 .patients-table {
   width: 100%;
-  min-width: 1000px;
+  min-width: 880px;
   border-collapse: collapse;
 }
 
@@ -243,11 +248,40 @@
   color: #17324d;
 }
 
+html[data-theme="dark"] .patients-page { background: var(--s007-page); color: var(--s007-text); }
+html[data-theme="dark"] .patients-header,
+html[data-theme="dark"] .patients-search-container,
+html[data-theme="dark"] .patients-message,
+html[data-theme="dark"] .patients-empty,
+html[data-theme="dark"] .patients-table-container { background: var(--s007-surface); border-color: var(--s007-border); box-shadow: none; }
+html[data-theme="dark"] :is(.patients-header h1,.patients-toolbar h2,.patients-empty h3,.patient-document strong,.patient-name) { color: var(--s007-heading); }
+html[data-theme="dark"] :is(.patients-header p,.patients-toolbar span,.patients-message,.patients-empty p,.patients-table td) { color: var(--s007-muted); }
+html[data-theme="dark"] .patients-search-container label { color: var(--s007-text); }
+html[data-theme="dark"] .patients-search-container :is(input,select) { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
+html[data-theme="dark"] .patients-search-container input::placeholder { color: var(--s007-muted); opacity: 1; }
+html[data-theme="dark"] .patients-table thead { background: var(--s007-table-header); }
+html[data-theme="dark"] .patients-table :is(th,td) { border-color: var(--s007-border); }
+html[data-theme="dark"] .patients-table th { color: var(--s007-heading); }
+html[data-theme="dark"] .patients-table tbody tr:hover { background: #29445e; }
+html[data-theme="dark"] .patients-back-button,
+html[data-theme="dark"] .table-pagination button { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
+html[data-theme="dark"] .patient-document span { color: #42d5df; }
+
 .patients-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+
+/* Densidad y lectura consistentes con el shell institucional. */
+.patients-content { max-width: none; padding: 22px 0; }
+.patients-search-container { margin-top: 16px; padding: 16px; }
+.patients-search-container input,.patients-search-container select { font-size: 14px; }
+.patients-table th { font-size: 12px; }
+.patients-table td { font-size: 14px; line-height: 1.4; }
+.patient-document strong,.patient-name { font-size: 14px; }
+.patient-document span { font-size: 12px; }
+.patient-action-secondary,.patient-action-primary { min-height: 34px; font-size: 13px; white-space: nowrap; }
 
 .patient-action-secondary,
 .patient-action-primary {
