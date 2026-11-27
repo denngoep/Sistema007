@@ -4,7 +4,10 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
-describe('AppController (e2e)', () => {
+// HTTP smoke test of the assembled application; never connects to MySQL.
+jest.mock('../src/prisma/prisma.service', () => ({ PrismaService: class {} }));
+
+describe('AppController (HTTP, isolated database)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
