@@ -2,13 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
-  createClinicalAttention,
+  createClinicalEncounter,
   getClinicalHistoryByPatient,
 } from "../services/clinical-history.service";
 
 import {
-  createFormulation,
-  createPatientDiagnosis,
   getActiveDiagnosesByPatient,
   getActiveFormulationsByPatient,
 } from "../services/formulations.service";
@@ -20,6 +18,8 @@ import type {
 } from "../services/formulations.service";
 
 import "../styles/ClinicalHistory.css";
+import { validateMedication } from "../validation/medication-validation";
+import { canRegisterClinicalAttention } from "../validation/clinical-access";
 
 interface FormulationDiagnosis {
   id: number;
@@ -111,6 +111,15 @@ const emptyMedication = (): MedicationForm => ({
 });
 
 function ClinicalHistory() {
+  const canRegisterAttention = canRegisterClinicalAttention(localStorage.getItem("user"));
+  const isAdministrator = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "{}").rol === "ADMINISTRADOR";
+    } catch {
+      return false;
+    }
+  })();
+  const canPreviewAttentionForm = canRegisterAttention || isAdministrator;
   const navigate = useNavigate();
   const { patientId } = useParams();
 
@@ -131,6 +140,7 @@ function ClinicalHistory() {
   const [expandedFormulationId, setExpandedFormulationId] = useState<
     number | null
   >(null);
+  const [expandedAttentionId, setExpandedAttentionId] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -382,6 +392,12 @@ function ClinicalHistory() {
   ) => {
     event.preventDefault();
 
+    if (savingAttention) return;
+    if (!canRegisterAttention) {
+      setAttentionError("No tienes permisos para registrar atenciones clínicas");
+      return;
+    }
+
     const id = Number(patientId);
 
     if (!patientId || Number.isNaN(id)) {
@@ -424,95 +440,78 @@ function ClinicalHistory() {
       return;
     }
 
-    const hasIncompleteMedication = medicamentos.some((medication) => {
-      const cantidad = Number(medication.cantidad);
-
-      return (
-        !medication.medicamento.trim() ||
-        !medication.dosis.trim() ||
-        !medication.frecuencia.trim() ||
-        Number.isNaN(cantidad) ||
-        !Number.isInteger(cantidad) ||
-        cantidad < 1
+    const validations = medicamentos.map((medication, index) => {
+      const validationInput = {
+        ...medication,
+        cantidad: Number(medication.cantidad),
+      };
+      const result = validateMedication(
+        validationInput,
+        indicaciones,
       );
+      return {
+        errors: result.errors.map(
+          (message) => `Medicamento ${index + 1}: ${message}`,
+        ),
+        warnings: result.warnings.map(
+          (message) => `Medicamento ${index + 1}: ${message}`,
+        ),
+      };
     });
-
-    if (hasIncompleteMedication) {
+    const validationErrors = validations.flatMap((result) => result.errors);
+    if (!medicamentos.length || validationErrors.length) {
       setAttentionError(
-        "Cada medicamento debe tener nombre, dosis, frecuencia y una cantidad válida",
+        validationErrors.join(" ") || "Debe agregar al menos un medicamento",
       );
       return;
     }
+    const warnings = validations.flatMap((result) => result.warnings);
+    if (
+      warnings.length &&
+      !window.confirm(
+        `${warnings.join("\n\n")}\n\n¿Ha revisado la pauta y desea continuar con los valores prescritos?`,
+      )
+    ) return;
 
     try {
       setSavingAttention(true);
       setAttentionError("");
       setAttentionSuccess("");
 
-      const attentionResponse = await createClinicalAttention({
+      const attentionResponse = await createClinicalEncounter({
         pacienteId: id,
-
-        // Temporalmente usamos el profesional 1.
-        // Después se tomará del usuario autenticado.
-        profesionalId: 1,
-
         motivoConsulta: motivoConsulta.trim(),
         evolucion: evolucion.trim(),
         diagnostico: diagnostico.trim(),
-
         observaciones: observacionesAtencion.trim() || undefined,
-      });
+        ...(pendingDiagnosis
+          ? { nuevoDiagnostico: { ...pendingDiagnosis } }
+          : { diagnosticoPacienteId: Number(diagnosticoPacienteId) }),
+        formulacion: {
+          vigenciaMeses: parsedVigencia,
 
-      let diagnosisId: number;
+          indicaciones: indicaciones.trim() || undefined,
 
-      if (pendingDiagnosis) {
-        const diagnosisResponse = await createPatientDiagnosis({
-          pacienteId: id,
+          medicamentos: medicamentos.map((medication) => ({
+            medicamento: medication.medicamento.trim(),
 
-          atencionClinicaId: attentionResponse.atencionClinica.id,
+            concentracion: medication.concentracion.trim() || undefined,
 
-          nombre: pendingDiagnosis.nombre,
-          codigoCie10: pendingDiagnosis.codigoCie10,
-          tipo: pendingDiagnosis.tipo,
+            formaFarmaceutica: medication.formaFarmaceutica.trim() || undefined,
 
-          requiereEsquema: pendingDiagnosis.requiereEsquema,
+            dosis: medication.dosis.trim(),
 
-          observaciones: pendingDiagnosis.observaciones,
-        });
+            frecuencia: medication.frecuencia.trim(),
 
-        diagnosisId = diagnosisResponse.diagnostico.id;
-      } else {
-        diagnosisId = Number(diagnosticoPacienteId);
-      }
+            duracion: medication.duracion.trim() || undefined,
 
-      await createFormulation({
-        atencionClinicaId: attentionResponse.atencionClinica.id,
+            cantidad: Number(medication.cantidad),
 
-        diagnosticoPacienteId: diagnosisId,
+            viaAdministracion: medication.viaAdministracion.trim() || undefined,
 
-        vigenciaMeses: parsedVigencia,
-
-        indicaciones: indicaciones.trim() || undefined,
-
-        medicamentos: medicamentos.map((medication) => ({
-          medicamento: medication.medicamento.trim(),
-
-          concentracion: medication.concentracion.trim() || undefined,
-
-          formaFarmaceutica: medication.formaFarmaceutica.trim() || undefined,
-
-          dosis: medication.dosis.trim(),
-
-          frecuencia: medication.frecuencia.trim(),
-
-          duracion: medication.duracion.trim() || undefined,
-
-          cantidad: Number(medication.cantidad),
-
-          viaAdministracion: medication.viaAdministracion.trim() || undefined,
-
-          observaciones: medication.observaciones.trim() || undefined,
-        })),
+            observaciones: medication.observaciones.trim() || undefined,
+          })),
+        },
       });
 
       setAttentionSuccess(
@@ -678,7 +677,7 @@ function ClinicalHistory() {
                 <h2>Atenciones clínicas</h2>
               </div>
 
-              {!showAttentionForm && (
+              {canPreviewAttentionForm && !showAttentionForm && (
                 <button
                   type="button"
                   className="clinical-history-action-button"
@@ -693,11 +692,17 @@ function ClinicalHistory() {
               <div className="clinical-history-success">{attentionSuccess}</div>
             )}
 
-            {showAttentionForm && (
+            {canPreviewAttentionForm && showAttentionForm && (
               <form
                 className="clinical-history-attention-form"
                 onSubmit={handleCreateAttention}
               >
+                {isAdministrator && (
+                  <p className="clinical-history-info" role="status">
+                    Vista de supervisión: los actos clínicos solo pueden ser registrados y firmados por un médico autorizado.
+                  </p>
+                )}
+                <fieldset disabled={!canRegisterAttention}>
                 <section className="clinical-history-form-section">
                   <div className="clinical-history-form-section-header">
                     <span>Atención médica</span>
@@ -1121,7 +1126,7 @@ function ClinicalHistory() {
                           </div>
 
                           <div className="clinical-history-form-field">
-                            <label>Duración</label>
+                            <label>Duración del tratamiento *</label>
 
                             <input
                               type="text"
@@ -1138,7 +1143,7 @@ function ClinicalHistory() {
                           </div>
 
                           <div className="clinical-history-form-field">
-                            <label>Cantidad *</label>
+                            <label>Cantidad total (unidades) *</label>
 
                             <input
                               type="number"
@@ -1228,6 +1233,7 @@ function ClinicalHistory() {
                       : "Guardar atención y formulación"}
                   </button>
                 </div>
+                </fieldset>
               </form>
             )}
 
@@ -1265,6 +1271,16 @@ function ClinicalHistory() {
                       <span>Rol</span>
                       <strong>{attention.profesional.rol}</strong>
                     </div>
+                    <button type="button" className="clinical-history-add-medication" onClick={() => setExpandedAttentionId((current) => current === attention.id ? null : attention.id)}>
+                      {expandedAttentionId === attention.id ? "Ocultar detalle" : "Ver detalle"}
+                    </button>
+                    {expandedAttentionId === attention.id && <div className="clinical-history-attention-detail">
+                      <div><span>Motivo de consulta</span><p>{attention.motivoConsulta || "No registrado"}</p></div>
+                      <div><span>Evolución</span><p>{attention.evolucion || "No registrada"}</p></div>
+                      <div><span>Observaciones</span><p>{attention.observaciones || "Sin observaciones"}</p></div>
+                      <div><span>Diagnósticos CIE-10</span><p>{attention.diagnosticosPaciente.length ? attention.diagnosticosPaciente.map((diagnosis) => `${diagnosis.codigoCie10 ? `${diagnosis.codigoCie10} — ` : ""}${diagnosis.nombre}`).join(" · ") : attention.diagnostico || "No registrado"}</p></div>
+                      <div><span>Formulaciones asociadas</span>{attention.formulaciones.length ? attention.formulaciones.map((formulation) => <p key={formulation.id}>{formulation.medicamentos.map((medication) => `${medication.medicamento}${medication.concentracion ? ` ${medication.concentracion}` : ""} — ${medication.dosis}, ${medication.frecuencia}, ${medication.cantidad} unidad(es)`).join(" · ")}</p>) : <p>Sin formulaciones asociadas.</p>}</div>
+                    </div>}
                   </div>
                 ))}
               </div>

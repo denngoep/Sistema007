@@ -59,7 +59,22 @@ export interface ActiveDiagnosesResponse {
   diagnosticos: PatientDiagnosis[];
 }
 
-const API_URL = "http://localhost:3000";
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
+
+async function authenticatedFetch(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+): Promise<Response> {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("Debes iniciar sesión para acceder a la información clínica");
+  }
+
+  const headers = new Headers(init.headers);
+  headers.set("Authorization", `Bearer ${token}`);
+  return fetch(input, { ...init, headers });
+}
 
 async function getResponseData(response: Response) {
   const data = await response.json();
@@ -78,7 +93,7 @@ async function getResponseData(response: Response) {
 }
 
 export async function createFormulation(formulation: CreateFormulationData) {
-  const response = await fetch(`${API_URL}/formulations`, {
+  const response = await authenticatedFetch(`${API_URL}/formulations`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -92,7 +107,7 @@ export async function createFormulation(formulation: CreateFormulationData) {
 export async function createPatientDiagnosis(
   diagnosis: CreatePatientDiagnosisData,
 ): Promise<CreatePatientDiagnosisResponse> {
-  const response = await fetch(`${API_URL}/formulations/diagnoses`, {
+  const response = await authenticatedFetch(`${API_URL}/formulations/diagnoses`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -106,7 +121,7 @@ export async function createPatientDiagnosis(
 export async function getActiveDiagnosesByPatient(
   patientId: number,
 ): Promise<ActiveDiagnosesResponse> {
-  const response = await fetch(
+  const response = await authenticatedFetch(
     `${API_URL}/formulations/patient/${patientId}/diagnoses`,
   );
 
@@ -114,7 +129,7 @@ export async function getActiveDiagnosesByPatient(
 }
 
 export async function getActiveFormulationsByPatient(patientId: number) {
-  const response = await fetch(
+  const response = await authenticatedFetch(
     `${API_URL}/formulations/patient/${patientId}/active`,
   );
 

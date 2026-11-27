@@ -238,6 +238,22 @@
   border-bottom: 1px solid #e8edf1;
 }
 
+.clinical-history-attention-form fieldset {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.clinical-history-info {
+  background: color-mix(in srgb, var(--s007-accent) 14%, var(--s007-surface));
+  border: 1px solid color-mix(in srgb, var(--s007-accent) 42%, var(--s007-border));
+  border-radius: 8px;
+  color: var(--s007-text);
+  margin: 0 0 16px;
+  padding: 10px 12px;
+}
+
 .clinical-history-form-section {
   padding: 20px;
   border: 1px solid #e1e8ed;
@@ -511,6 +527,21 @@
   font-size: 12px;
   font-weight: 600;
   overflow-wrap: anywhere;
+}
+
+.clinical-history-attention-detail {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e1e8ed;
+}
+
+.clinical-history-attention-detail p {
+  margin: 4px 0 0;
+  color: #526d7f;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 /* ESTADOS VACÍOS */
@@ -872,7 +903,22 @@
   gap: 7px;
   width: fit-content;
   color: #526b7c;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Atención, diagnósticos y formulación: se conserva el tema claro y se usan
+ * superficies semánticas para evitar tarjetas blancas en modo oscuro. */
+html[data-theme="dark"] .clinical-history-page { background: var(--s007-page); color: var(--s007-text); }
+html[data-theme="dark"] :is(.clinical-history-summary,.clinical-history-card,.clinical-history-state,.clinical-history-attention,.clinical-history-formulation,.clinical-history-empty) { background: var(--s007-surface); border-color: var(--s007-border); box-shadow: none; }
+html[data-theme="dark"] :is(.clinical-history-form-section,.clinical-history-new-medication,.clinical-history-attention-detail,.clinical-history-formulation-detail,.clinical-history-detail-block,.clinical-history-medication) { background: var(--s007-header); border-color: var(--s007-border); }
+html[data-theme="dark"] :is(.clinical-history-header h1,.clinical-history-card h2,.clinical-history-card h3,.clinical-history-summary strong,.clinical-history-formulation-main strong,.clinical-history-attention strong) { color: var(--s007-heading); }
+html[data-theme="dark"] :is(.clinical-history-page p,.clinical-history-page span,.clinical-history-general-data,.clinical-history-formulation-meta,.clinical-history-detail-grid,.clinical-history-medication-grid) { color: var(--s007-muted); }
+html[data-theme="dark"] :is(.clinical-history-formulation-meta strong,.clinical-history-general-data strong,.clinical-history-detail-grid p,.clinical-history-detail-block p,.clinical-history-medication-grid p,.clinical-history-medication-observation p,.clinical-history-attention-detail p,.clinical-history-medication > strong) { color: var(--s007-text); }
+html[data-theme="dark"] :is(.clinical-history-general-data > div,.clinical-history-attention-detail,.clinical-history-formulation-detail,.clinical-history-detail-block,.clinical-history-medications,.clinical-history-medication-observation,.clinical-history-medication) { border-color: var(--s007-border); }
+html[data-theme="dark"] :is(.clinical-history-formulation-meta span,.clinical-history-formulation-main p,.clinical-history-empty p,.clinical-history-form-section-header p,.clinical-history-state p) { color: var(--s007-muted); }
+html[data-theme="dark"] :is(.clinical-history-form-field input,.clinical-history-form-field select,.clinical-history-form-field textarea) { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
+html[data-theme="dark"] :is(.clinical-history-form-field input,.clinical-history-form-field textarea)::placeholder { color: var(--s007-muted); opacity: 1; }
+html[data-theme="dark"] :is(.clinical-history-back,.clinical-history-cancel-button,.clinical-history-detail-button) { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
+html[data-theme="dark"] :is(.clinical-history-card-header,.clinical-history-form-section-header,.clinical-history-new-medication-header) { border-color: var(--s007-border); }

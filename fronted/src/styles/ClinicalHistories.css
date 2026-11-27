@@ -336,3 +336,15 @@
     margin-top: 4px;
   }
 }
+
+/* Búsqueda y listado clínico: superficies propias del módulo en tema oscuro. */
+html[data-theme="dark"] .clinical-histories-page { background: var(--s007-page); color: var(--s007-text); }
+html[data-theme="dark"] :is(.clinical-histories-search-section,.clinical-histories-results) { background: var(--s007-surface); border-color: var(--s007-border); box-shadow: none; }
+html[data-theme="dark"] :is(.clinical-histories-header h1,.clinical-histories-search-heading h2,.clinical-histories-results-heading h2,.clinical-histories-patient-main strong) { color: var(--s007-heading); }
+html[data-theme="dark"] :is(.clinical-histories-header p,.clinical-histories-search-heading p,.clinical-histories-results-heading p,.clinical-histories-patient-main span,.clinical-histories-patient-contact,.clinical-histories-message) { color: var(--s007-muted); }
+html[data-theme="dark"] .clinical-histories-search-box input { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
+html[data-theme="dark"] .clinical-histories-search-box input::placeholder { color: var(--s007-muted); opacity: 1; }
+html[data-theme="dark"] .clinical-histories-patient-card { border-color: var(--s007-border); }
+html[data-theme="dark"] .clinical-histories-patient-card:hover { background: #29445e; }
+html[data-theme="dark"] .clinical-histories-patient-avatar { background: var(--s007-control); color: #58d8df; }
+html[data-theme="dark"] .clinical-histories-back-button { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
