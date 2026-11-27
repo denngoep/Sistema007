@@ -1,3 +1,4 @@
+import type { Prisma } from '../generated/prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFormulationDto } from '../dto/create-formulation.dto';
@@ -7,8 +8,11 @@ import { CreatePatientDiagnosisDto } from '../dto/create-patient-diagnosis.dto';
 export class FormulationsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findClinicalCareById(atencionClinicaId: number) {
-    return this.prisma.atencionClinica.findUnique({
+  findClinicalCareById(
+    atencionClinicaId: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    return (tx ?? this.prisma).atencionClinica.findUnique({
       where: {
         id: atencionClinicaId,
       },
@@ -31,8 +35,11 @@ export class FormulationsRepository {
     });
   }
 
-  findDiagnosisById(diagnosticoPacienteId: number) {
-    return this.prisma.diagnosticoPaciente.findUnique({
+  findDiagnosisById(
+    diagnosticoPacienteId: number,
+    tx?: Prisma.TransactionClient,
+  ) {
+    return (tx ?? this.prisma).diagnosticoPaciente.findUnique({
       where: {
         id: diagnosticoPacienteId,
       },
@@ -79,8 +86,12 @@ export class FormulationsRepository {
     });
   }
 
-  findDiagnosisByCodeAndPatient(patientId: number, codigoCie10: string) {
-    return this.prisma.diagnosticoPaciente.findFirst({
+  findDiagnosisByCodeAndPatient(
+    patientId: number,
+    codigoCie10: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    return (tx ?? this.prisma).diagnosticoPaciente.findFirst({
       where: {
         codigoCie10: codigoCie10,
         activo: true,
@@ -91,8 +102,8 @@ export class FormulationsRepository {
     });
   }
 
-  findPatientById(patientId: number) {
-    return this.prisma.paciente.findUnique({
+  findPatientById(patientId: number, tx?: Prisma.TransactionClient) {
+    return (tx ?? this.prisma).paciente.findUnique({
       where: {
         id: patientId,
       },
@@ -115,8 +126,9 @@ export class FormulationsRepository {
   createPatientDiagnosis(
     historiaClinicaId: number,
     createPatientDiagnosisDto: CreatePatientDiagnosisDto,
+    tx?: Prisma.TransactionClient,
   ) {
-    return this.prisma.diagnosticoPaciente.create({
+    return (tx ?? this.prisma).diagnosticoPaciente.create({
       data: {
         historiaClinicaId,
         atencionClinicaId: createPatientDiagnosisDto.atencionClinicaId,
@@ -185,8 +197,11 @@ export class FormulationsRepository {
     });
   }
 
-  create(createFormulationDto: CreateFormulationDto) {
-    return this.prisma.formulacion.create({
+  create(
+    createFormulationDto: CreateFormulationDto,
+    tx?: Prisma.TransactionClient,
+  ) {
+    return (tx ?? this.prisma).formulacion.create({
       data: {
         atencionClinicaId: createFormulationDto.atencionClinicaId,
         diagnosticoPacienteId: createFormulationDto.diagnosticoPacienteId,

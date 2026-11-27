@@ -1,3 +1,4 @@
+import type { Prisma } from '../generated/prisma/client';
 import {
   BadRequestException,
   Injectable,
@@ -7,6 +8,7 @@ import {
 import { CreateFormulationDto } from '../dto/create-formulation.dto';
 import { CreatePatientDiagnosisDto } from '../dto/create-patient-diagnosis.dto';
 import { FormulationsRepository } from '../repositories/formulations.repository';
+import { validateMedication } from '../formulations/medication-validation';
 
 @Injectable()
 export class FormulationsService {
@@ -14,18 +16,58 @@ export class FormulationsService {
     private readonly formulationsRepository: FormulationsRepository,
   ) {}
 
-  async createFormulation(createFormulationDto: CreateFormulationDto) {
+  async createFormulation(
+    createFormulationDto: CreateFormulationDto,
+    tx?: Prisma.TransactionClient,
+  ) {
+    if (
+      !Array.isArray(createFormulationDto.medicamentos) ||
+      !createFormulationDto.medicamentos.length
+    ) {
+      throw new BadRequestException(
+        'La formulación debe incluir al menos un medicamento',
+      );
+    }
+    const validations = createFormulationDto.medicamentos.map(
+      (medication, index) => {
+        const result = validateMedication(
+          medication,
+          createFormulationDto.indicaciones,
+        );
+        return {
+          errors: result.errors.map(
+            (message) => `Medicamento ${index + 1}: ${message}`,
+          ),
+          warnings: result.warnings.map(
+            (message) => `Medicamento ${index + 1}: ${message}`,
+          ),
+        };
+      },
+    );
+    const errors = validations.flatMap((result) => result.errors);
+    if (errors.length) {
+      throw new BadRequestException({
+        message: errors,
+        codigo: 'FORMULACION_INCONSISTENTE',
+      });
+    }
     const clinicalCare = await this.formulationsRepository.findClinicalCareById(
       createFormulationDto.atencionClinicaId,
+      tx,
     );
 
     if (!clinicalCare) {
       throw new NotFoundException('La atención clínica indicada no existe');
     }
 
+    if (!clinicalCare.historiaClinica.paciente.activo) {
+      throw new BadRequestException('El paciente se encuentra inactivo');
+    }
+
     if (createFormulationDto.diagnosticoPacienteId) {
       const diagnosis = await this.formulationsRepository.findDiagnosisById(
         createFormulationDto.diagnosticoPacienteId,
+        tx,
       );
 
       if (!diagnosis) {
@@ -73,14 +115,23 @@ export class FormulationsService {
       }
     }
 
-    return this.formulationsRepository.create(createFormulationDto);
+    const formulation = await this.formulationsRepository.create(
+      createFormulationDto,
+      tx,
+    );
+    return {
+      ...formulation,
+      advertenciasValidacion: validations.flatMap((result) => result.warnings),
+    };
   }
 
   async createPatientDiagnosis(
     createPatientDiagnosisDto: CreatePatientDiagnosisDto,
+    tx?: Prisma.TransactionClient,
   ) {
     const patient = await this.formulationsRepository.findPatientById(
       createPatientDiagnosisDto.pacienteId,
+      tx,
     );
 
     if (!patient) {
@@ -101,6 +152,7 @@ export class FormulationsService {
       const clinicalCare =
         await this.formulationsRepository.findClinicalCareById(
           createPatientDiagnosisDto.atencionClinicaId,
+          tx,
         );
 
       if (!clinicalCare) {
@@ -129,6 +181,7 @@ export class FormulationsService {
         await this.formulationsRepository.findDiagnosisByCodeAndPatient(
           createPatientDiagnosisDto.pacienteId,
           codigoCie10,
+          tx,
         );
 
       if (existingDiagnosis) {
@@ -145,6 +198,7 @@ export class FormulationsService {
         nombre,
         codigoCie10,
       },
+      tx,
     );
 
     return {
