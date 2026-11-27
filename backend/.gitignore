@@ -64,3 +64,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 skills-lock.json
 # Configuracion privada de Docker
 .env.docker
+
+# Private dispensing documents (must also be backed up)
+/private-documents/
+/private-inventory-documents/
+/private-inventory-documents-test/
