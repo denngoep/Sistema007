@@ -1,0 +1,804 @@
+.dispensation-documents {
+  max-width: 1500px;
+  margin: 34px auto;
+  padding: 28px;
+  border: 1px solid #e1e8ed;
+  border-radius: 13px;
+  background: #ffffff;
+  box-shadow: 0 5px 18px rgba(28, 63, 91, 0.035);
+  color: #17324d;
+}
+
+.dispensation-documents__header,
+.dispensation-documents__detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.dispensation-documents__eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  color: #00aebc;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dispensation-documents h2,
+.dispensation-documents h3,
+.dispensation-documents h4,
+.dispensation-documents h5 {
+  margin: 0;
+  color: #062b55;
+}
+
+.dispensation-documents__header h2 {
+  font-size: 22px;
+}
+
+.dispensation-documents__header p,
+.dispensation-documents__form-heading p {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: #718492;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* BÚSQUEDA */
+
+.dispensation-documents__search {
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #e1e8ed;
+  border-radius: 11px;
+  background: #f8fafb;
+}
+
+.dispensation-documents__search > label,
+.dispensation-documents__form-section label,
+.dispensation-documents__file-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #29465f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dispensation-documents__search-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.dispensation-documents input,
+.dispensation-documents select,
+.dispensation-documents textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #d6e1e8;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: #17324d;
+  font: inherit;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.dispensation-documents textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.dispensation-documents input:focus,
+.dispensation-documents select:focus,
+.dispensation-documents textarea:focus {
+  border-color: #00aebc;
+  box-shadow: 0 0 0 3px rgba(0, 174, 188, 0.1);
+}
+
+/* HISTORIAL */
+
+.dispensation-documents__history {
+  margin-top: 24px;
+}
+
+.dispensation-documents__history-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.dispensation-documents__history-title h3 {
+  font-size: 17px;
+}
+
+.dispensation-documents__history-title span {
+  color: #82919d;
+  font-size: 12px;
+}
+
+.dispensation-documents__table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e0e7ec;
+  border-radius: 11px;
+}
+
+.dispensation-documents__table {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.dispensation-documents__table thead {
+  background: #f8fafb;
+}
+
+.dispensation-documents__table th {
+  padding: 14px 15px;
+  border-bottom: 1px solid #e0e7ec;
+  color: #657b8a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.dispensation-documents__table td {
+  max-width: 250px;
+  padding: 15px;
+  border-bottom: 1px solid #edf1f4;
+  color: #526b7b;
+  font-size: 12px;
+  vertical-align: top;
+}
+
+.dispensation-documents__table tr:last-child td {
+  border-bottom: 0;
+}
+
+.dispensation-documents__table tbody tr:hover {
+  background: #fbfcfd;
+}
+
+.dispensation-documents__table strong {
+  display: block;
+  color: #17324d;
+  font-size: 13px;
+}
+
+.dispensation-documents__table small,
+.dispensation-documents__medications {
+  display: block;
+  margin-top: 5px;
+  color: #82919d;
+  line-height: 1.45;
+}
+
+.dispensation-documents__ingress {
+  color: #007f8a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dispensation-documents__medications {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dispensation-documents__empty {
+  padding: 32px;
+  color: #82919d;
+  text-align: center;
+}
+
+/* REPORTES */
+
+.dispensation-documents__reports {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #d8edf0;
+  border-radius: 12px;
+  background: #f8fcfc;
+}
+
+.dispensation-documents__reports header p {
+  margin: 7px 0 0;
+  color: #718492;
+  font-size: 13px;
+}
+
+.dispensation-documents__report-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 18px;
+  margin-top: 18px;
+}
+
+.dispensation-documents__report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.dispensation-documents__report-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.dispensation-documents__report-summary > div {
+  padding: 15px;
+  border: 1px solid #d8edf0;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.dispensation-documents__report-summary span {
+  display: block;
+  color: #657b8a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dispensation-documents__report-summary strong {
+  display: block;
+  margin-top: 6px;
+  color: #062b55;
+  font-size: 22px;
+}
+
+/* ESTADOS */
+
+.dispensation-documents__tag {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 190px;
+  margin: 0 4px 5px 0;
+  padding: 6px 9px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dispensation-documents__tag--delivery-confirmada {
+  background: #e2f7ee;
+  color: #147d52;
+}
+
+.dispensation-documents__tag--delivery-pendiente {
+  background: #fff5df;
+  color: #9b6810;
+}
+
+.dispensation-documents__tag--delivery-anulada {
+  background: #fff0ed;
+  color: #ba4936;
+}
+
+.dispensation-documents__tag--document-registrado {
+  background: #eaf9fa;
+  color: #007f8a;
+}
+
+.dispensation-documents__tag--document-pendiente {
+  background: #fff5df;
+  color: #9b6810;
+}
+
+.dispensation-documents__tag--document-legado_por_verificar {
+  background: #eef1f4;
+  color: #5c6b76;
+}
+
+/* FONDO DEL MODAL */
+
+.dispensation-documents__modal-overlay {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow-y: auto;
+  background: rgba(6, 43, 85, 0.52);
+  box-sizing: border-box;
+}
+
+/* VENTANA NORMAL */
+
+.dispensation-documents__detail {
+  position: relative;
+  width: min(1080px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 26px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(5, 29, 57, 0.28);
+  box-sizing: border-box;
+  scrollbar-gutter: stable;
+}
+
+/* VENTANA AMPLIADA */
+
+.dispensation-documents__detail--maximized {
+  width: 100%;
+  max-width: none;
+  height: calc(100dvh - 48px);
+  max-height: calc(100dvh - 48px);
+  border-radius: 12px;
+}
+
+/* ENCABEZADO FIJO DEL MODAL */
+
+.dispensation-documents__detail-header {
+  position: sticky;
+  top: -26px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: -26px -26px 0;
+  padding: 20px 26px;
+  border-bottom: 1px solid #e1e8ed;
+  border-radius: 14px 14px 0 0;
+  background: #ffffff;
+  box-shadow: 0 3px 12px rgba(6, 43, 85, 0.035);
+}
+
+.dispensation-documents__detail-heading {
+  min-width: 0;
+  flex: 1;
+}
+
+.dispensation-documents__detail-header h3 {
+  margin-top: 2px;
+  font-size: 19px;
+  overflow-wrap: anywhere;
+}
+
+.dispensation-documents__status-group {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* BOTONES DE VENTANA */
+
+.dispensation-documents__window-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.dispensation-documents__window-button,
+.dispensation-documents__modal-close {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid #d6e1e8;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #062b55;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.dispensation-documents__window-button {
+  font-size: 18px;
+}
+
+.dispensation-documents__modal-close {
+  font-size: 25px;
+  line-height: 1;
+}
+
+.dispensation-documents__window-button:hover:not(:disabled),
+.dispensation-documents__modal-close:hover:not(:disabled) {
+  border-color: #00aebc;
+  background: #eaf9fa;
+}
+
+.dispensation-documents__window-button:active,
+.dispensation-documents__modal-close:active {
+  transform: scale(0.96);
+}
+
+.dispensation-documents__window-button:focus-visible,
+.dispensation-documents__modal-close:focus-visible {
+  outline: 3px solid rgba(0, 174, 188, 0.35);
+  outline-offset: 2px;
+}
+
+.dispensation-documents__modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* INFORMACIÓN GENERAL */
+
+.dispensation-documents__detail-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.dispensation-documents__detail-summary > div {
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid #d8edf0;
+  border-radius: 9px;
+  background: #f8fcfc;
+}
+
+.dispensation-documents__detail-summary span,
+.dispensation-documents__detail-summary small {
+  display: block;
+  color: #657b8a;
+  font-size: 11px;
+}
+
+.dispensation-documents__detail-summary strong {
+  display: block;
+  margin: 5px 0 3px;
+  overflow-wrap: anywhere;
+  color: #062b55;
+  font-size: 13px;
+}
+
+/* MEDICAMENTOS ENTREGADOS */
+
+.dispensation-documents__delivered-medications {
+  margin-top: 22px;
+}
+
+.dispensation-documents__delivered-medications h4 {
+  margin: 0 0 10px;
+  color: #062b55;
+  font-size: 16px;
+}
+
+/* ACCIONES */
+
+.dispensation-documents__actions,
+.dispensation-documents__submit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* FORMULARIO DE RECEPCIÓN */
+
+.dispensation-documents__form-area {
+  margin-top: 24px;
+  padding: 22px;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  background: #f8fafb;
+}
+
+.dispensation-documents__form-heading {
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e1e8ed;
+}
+
+.dispensation-documents__form-heading h4 {
+  font-size: 17px;
+}
+
+.dispensation-documents__form-section {
+  margin-top: 21px;
+}
+
+.dispensation-documents__form-section h5 {
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.dispensation-documents__field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.dispensation-documents__field-grid--third {
+  margin-top: 14px;
+}
+
+.dispensation-documents__mode-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; grid-column: 1 / -1; }
+.dispensation-documents__mode-picker button { display: flex; align-items: flex-start; gap: 11px; min-height: 82px; padding: 14px; border: 1px solid #c9dce5; border-radius: 10px; background: #fff; color: #17324d; text-align: left; font: inherit; cursor: pointer; }
+.dispensation-documents__mode-picker button:hover,.dispensation-documents__mode-picker button.active { border-color: #00aebc; background: #eaf9fa; box-shadow: 0 0 0 2px rgba(0,174,188,.12); }
+.dispensation-documents__mode-picker svg { flex: 0 0 auto; color: #008d99; }
+.dispensation-documents__mode-picker span { display: block; font-size: 13px; font-weight: 800; line-height: 1.35; }
+.dispensation-documents__mode-picker small { display: block; margin-top: 4px; color: #607684; font-size: 12px; font-weight: 500; }
+.dispensation-documents__receipt-requirement { margin-top: 16px; padding: 12px 14px; border: 1px solid #e6c66c; border-radius: 9px; background: #fff8e5; color: #755300; font-size: 13px; }
+
+.dispensation-documents__full-field {
+  max-width: 680px;
+}
+
+/* FIRMA MANUSCRITA */
+
+.dispensation-documents__signature {
+  display: grid;
+  grid-template-columns:
+    minmax(160px, 220px)
+    minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.dispensation-documents__signature strong {
+  display: block;
+  color: #062b55;
+  font-size: 13px;
+}
+
+.dispensation-documents__signature span,
+.dispensation-documents__file-field span,
+.dispensation-documents__file-field small {
+  color: #718492;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.dispensation-documents__signature canvas {
+  grid-row: span 2;
+  width: 100%;
+  min-height: 180px;
+  max-height: 260px;
+  border: 1px solid #9bcdd2;
+  border-radius: 10px;
+  background: #ffffff;
+  touch-action: none;
+}
+
+.dispensation-documents__signature .inventory-back-button {
+  width: fit-content;
+}
+
+.dispensation-documents__file-field {
+  max-width: 560px;
+}
+
+.dispensation-documents__file-field input {
+  padding: 9px;
+  background: #ffffff;
+}
+
+.dispensation-documents__file-field--drop input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+.dispensation-documents__select-file { width: fit-content; padding: 9px 13px; border: 1px solid #00aebc; border-radius: 7px; background: #fff; color: #007d87; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.dispensation-documents__select-file:hover { background: #eaf9fa; }
+
+.dispensation-documents__file-field--drop {
+  min-height: 150px;
+  padding: 18px;
+  border: 1px dashed #79cbd0;
+  border-radius: 10px;
+  background: #f8fcfc;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.dispensation-documents__file-field--drop.is-dragging {
+  border-color: #00aebc;
+  background: #eaf9fa;
+}
+
+.dispensation-documents__selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.dispensation-documents__selected-file button {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border: 1px solid #d59b91;
+  border-radius: 6px;
+  background: #fff5f2;
+  color: #a54938;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+html[data-theme="dark"] .dispensation-documents { background: #223b53; border-color: #3d5870; color: #f1f5f9; }
+html[data-theme="dark"] :is(.dispensation-documents__detail,.dispensation-documents__detail-header,.dispensation-documents__form-area,.dispensation-documents__search,.dispensation-documents__reports,.dispensation-documents__report-summary > div,.dispensation-documents__detail-summary > div) { background: #223b53; border-color: #3d5870; }
+html[data-theme="dark"] :is(.dispensation-documents h2,.dispensation-documents h3,.dispensation-documents h4,.dispensation-documents h5,.dispensation-documents strong) { color: #f1f5f9; }
+html[data-theme="dark"] :is(.dispensation-documents p,.dispensation-documents span,.dispensation-documents small) { color: #b8cadb; }
+html[data-theme="dark"] :is(.dispensation-documents input,.dispensation-documents select,.dispensation-documents textarea,.dispensation-documents__mode-picker button,.dispensation-documents__selected-file) { background: #29445e; color: #f1f5f9; border-color: #3d5870; }
+html[data-theme="dark"] .dispensation-documents__mode-picker button.active { background: #1b4b61; border-color: #00aebc; }
+
+/* VERSIONES DOCUMENTALES */
+
+.dispensation-documents__versions {
+  margin-top: 24px;
+}
+
+.dispensation-documents__versions h4 {
+  font-size: 16px;
+}
+
+.dispensation-documents__versions ol {
+  display: grid;
+  gap: 10px;
+  margin: 13px 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.dispensation-documents__versions li {
+  padding: 13px 15px;
+  border-left: 3px solid #00aebc;
+  border-radius: 0 8px 8px 0;
+  background: #f1fafb;
+}
+
+.dispensation-documents__versions li strong,
+.dispensation-documents__versions li span,
+.dispensation-documents__versions li small {
+  display: block;
+}
+
+.dispensation-documents__versions li span,
+.dispensation-documents__versions li small {
+  margin-top: 4px;
+  color: #607684;
+  font-size: 12px;
+}
+
+/* PANTALLAS MEDIANAS */
+
+@media (max-width: 1100px) {
+  .dispensation-documents__detail-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dispensation-documents__detail-header {
+    flex-wrap: wrap;
+  }
+
+  .dispensation-documents__status-group {
+    justify-content: flex-start;
+  }
+}
+
+/* PANTALLAS PEQUEÑAS */
+
+@media (max-width: 760px) {
+  .dispensation-documents {
+    margin: 24px 20px;
+    padding: 20px;
+  }
+
+  .dispensation-documents__header,
+  .dispensation-documents__history-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dispensation-documents__search-row,
+  .dispensation-documents__actions,
+  .dispensation-documents__submit {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dispensation-documents__search-row .inventory-receipt-submit,
+  .dispensation-documents__actions button,
+  .dispensation-documents__submit button {
+    width: 100%;
+  }
+
+  .dispensation-documents__field-grid,
+  .dispensation-documents__signature,
+  .dispensation-documents__report-filters,
+  .dispensation-documents__report-summary,
+  .dispensation-documents__detail-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .dispensation-documents__mode-picker { grid-template-columns: 1fr; }
+
+  .dispensation-documents__signature canvas {
+    grid-row: auto;
+  }
+
+  .dispensation-documents__modal-overlay {
+    padding: 12px;
+    place-items: start center;
+  }
+
+  .dispensation-documents__detail {
+    width: 100%;
+    max-height: calc(100dvh - 24px);
+    padding: 20px;
+  }
+
+  .dispensation-documents__detail--maximized {
+    height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  .dispensation-documents__detail-header {
+    top: -20px;
+    margin: -20px -20px 0;
+    padding: 16px 20px;
+    gap: 12px;
+  }
+
+  .dispensation-documents__detail-heading {
+    flex-basis: calc(100% - 100px);
+  }
+
+  .dispensation-documents__status-group {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+
+  .dispensation-documents__window-controls {
+    margin-left: auto;
+  }
+
+  .dispensation-documents__window-button,
+  .dispensation-documents__modal-close {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* TELÉFONOS */
+
+@media (max-width: 420px) {
+  .dispensation-documents {
+    margin: 18px 12px;
+    padding: 16px;
+  }
+
+  .dispensation-documents__form-area {
+    padding: 16px;
+  }
+
+  .dispensation-documents__detail-header h3 {
+    font-size: 15px;
+  }
+
+  .dispensation-documents__detail-header {
+    gap: 8px;
+  }
+}
+
+/* Se conservan los valores y se mejora únicamente la lectura de resúmenes y tablas. */
+.dispensation-documents__report-summary > div,.dispensation-documents__detail-summary > div { min-height: 84px; padding: 14px 16px; background: #fff; border-color: #dce8ee; }.dispensation-documents__report-summary span,.dispensation-documents__detail-summary span,.dispensation-documents__detail-summary small { font-size: 13px; color: #526f85; }.dispensation-documents__report-summary strong,.dispensation-documents__detail-summary strong { font-size: 23px; }.dispensation-documents table th { font-size: 12px; }.dispensation-documents table td { font-size: 14px; line-height: 1.4; }
