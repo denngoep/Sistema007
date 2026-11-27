@@ -1,0 +1,8 @@
+{
+  "name": "sistema007-dev",
+  "private": true,
+  "scripts": {
+    "dev": "powershell -ExecutionPolicy Bypass -File ./start-dev.ps1",
+    "dev:test": "powershell -ExecutionPolicy Bypass -File ./start-functional-dev.ps1"
+  }
+}
