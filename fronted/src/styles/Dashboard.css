@@ -15,13 +15,14 @@
   --dashboard-muted: #718399;
   --dashboard-border: #e2eaf1;
 
-  display: flex;
-  min-height: 100vh;
-  min-height: 100dvh;
-  background: #f5f8fb;
+  display: block;
+  min-height: 0;
+  background: transparent;
   color: var(--dashboard-text);
   font-family: inherit;
 }
+
+.dashboard-alert { margin: 0 0 14px; padding: 11px 14px; border: 1px solid #efc66b; border-radius: 9px; background: #fff8e6; color: #7b5600; font-size: 13px; }
 
 /* =========================================
    MENÚ LATERAL
@@ -379,7 +380,7 @@
   width: 100%;
   max-width: 1250px;
   margin: 0 auto;
-  padding: 28px 30px 36px;
+  padding: 20px 24px 24px;
 }
 
 /* BIENVENIDA */
@@ -391,8 +392,8 @@
   justify-content: space-between;
   gap: 20px;
 
-  min-height: 160px;
-  padding: 27px 32px;
+  min-height: 118px;
+  padding: 18px 22px;
 
   overflow: hidden;
   border: 1px solid #dce7ee;
@@ -409,7 +410,7 @@
 
 .welcome-label {
   display: inline-block;
-  margin-bottom: 9px;
+  margin-bottom: 6px;
 
   color: #008c99;
   font-size: 10px;
@@ -428,11 +429,11 @@
 
 .welcome-panel p {
   max-width: 590px;
-  margin: 11px 0 0;
+  margin: 7px 0 0;
 
   color: #687e90;
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 /* DECORACIÓN DISCRETA */
@@ -440,9 +441,16 @@
 .welcome-decoration {
   position: relative;
   flex-shrink: 0;
-  width: 125px;
-  height: 100px;
+  width: 104px;
+  height: 76px;
   opacity: 0.75;
+}
+
+.welcome-logo {
+  width: min(150px, 18vw);
+  max-height: 72px;
+  object-fit: contain;
+  object-position: right center;
 }
 
 .decoration-circle {
@@ -475,7 +483,7 @@
    ========================================= */
 
 .dashboard-summary {
-  margin-top: 29px;
+  margin-top: 20px;
 }
 
 .summary-heading {
@@ -503,8 +511,8 @@
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 15px;
-  margin-top: 17px;
+  gap: 14px;
+  margin-top: 14px;
 }
 
 .summary-card {
@@ -514,8 +522,8 @@
 
   width: 100%;
   min-width: 0;
-  min-height: 105px;
-  padding: 19px;
+  min-height: 76px;
+  padding: 12px 14px;
 
   border: 1px solid var(--dashboard-border);
   border-radius: 12px;
@@ -552,8 +560,8 @@
   justify-content: center;
 
   flex-shrink: 0;
-  width: 43px;
-  height: 43px;
+  width: 38px;
+  height: 38px;
 
   border-radius: 11px;
   background: #e9f8f9;
@@ -564,20 +572,20 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
 .summary-card-content strong {
   color: var(--dashboard-navy);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 750;
 }
 
 .summary-card-content small {
   color: var(--dashboard-muted);
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 .summary-card-arrow {
@@ -597,14 +605,14 @@
    ========================================= */
 
 .dashboard-pending {
-  margin-top: 29px;
+  margin-top: 20px;
 }
 
 .pending-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 .pending-item {
@@ -612,8 +620,8 @@
   align-items: center;
   gap: 10px;
 
-  min-height: 64px;
-  padding: 12px 16px;
+  min-height: 58px;
+  padding: 10px 14px;
 
   border: 1px solid #e6ebf0;
   border-radius: 11px;
@@ -719,6 +727,10 @@
     display: none;
   }
 
+  .welcome-logo {
+    display: none;
+  }
+
   .summary-grid,
   .pending-list {
     grid-template-columns: 1fr;
@@ -761,3 +773,12 @@
     transition: none;
   }
 }
+
+/* Tema oscuro del Dashboard: tokens propios para evitar contrastes heredados. */
+html[data-theme="dark"] .dashboard-page { --dashboard-navy: #f1f5f9; --dashboard-text: #f1f5f9; --dashboard-muted: #b8cadb; --dashboard-border: #3d5870; }
+html[data-theme="dark"] :is(.workspace-header,.sidebar-toggle) { background: #1b3148; border-color: #3d5870; }
+html[data-theme="dark"] .sidebar-toggle { color: #f1f5f9; }
+html[data-theme="dark"] :is(.welcome-panel,.summary-card,.pending-item) { background: #223b53; border-color: #3d5870; box-shadow: none; }
+html[data-theme="dark"] :is(.welcome-panel h2,.summary-heading h3,.pending-heading h3,.summary-card-content strong) { color: #f1f5f9; }
+html[data-theme="dark"] :is(.welcome-panel p,.summary-heading p,.pending-heading p,.summary-card-content small,.pending-item > span:nth-child(2),.pending-item small) { color: #b8cadb; }
+html[data-theme="dark"] :is(.summary-card-icon,.pending-icon,.user-avatar) { background: #29445e; }

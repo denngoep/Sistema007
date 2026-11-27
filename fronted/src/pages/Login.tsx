@@ -5,7 +5,10 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 
 import { loginUser } from "../services/auth.service";
+import ThemeToggle from "../components/ThemeToggle";
 import "../styles/Login.css";
+
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
 
 type AuthResponse = {
   success: boolean;
@@ -80,7 +83,7 @@ function Login() {
     setGoogleLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/google", {
+      const response = await fetch(`${API_URL}/api/auth/google`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,6 +127,7 @@ function Login() {
 
   return (
     <main className="login-page">
+      <div className="public-theme-toggle"><ThemeToggle /></div>
       <div className="login-layout">
         {/* IDENTIDAD INSTITUCIONAL */}
         <header className="login-identity">

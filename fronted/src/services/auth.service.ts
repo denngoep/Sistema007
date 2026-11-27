@@ -1,3 +1,5 @@
+import type { UserRole } from "./users.service";
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -8,6 +10,7 @@ export interface LoginUser {
   id: number;
   nombre: string;
   email: string;
+  rol: UserRole;
   activo: boolean;
 }
 
@@ -18,7 +21,7 @@ export interface LoginResponse {
   user: LoginUser;
 }
 
-const API_URL = "http://localhost:3000";
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
 
 export async function loginUser(
   credentials: LoginRequest,

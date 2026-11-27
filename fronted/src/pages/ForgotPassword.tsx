@@ -3,8 +3,9 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "../styles/ForgotPassword.css";
+import ThemeToggle from "../components/ThemeToggle";
 
-const API_URL = "http://localhost:3000/api/auth";
+const API_URL = `${(import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "")}/api/auth`;
 
 function PasswordEye({ visible }: { visible: boolean }) {
   return visible ? (
@@ -171,6 +172,7 @@ function ForgotPassword() {
 
   return (
     <main className="recovery-page">
+      <div className="public-theme-toggle"><ThemeToggle /></div>
       <div className="recovery-content">
         {/* IDENTIDAD DE SISTEMA007 */}
         <header className="recovery-brand">

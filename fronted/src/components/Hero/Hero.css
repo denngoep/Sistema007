@@ -460,3 +460,9 @@
     transition: none !important;
   }
 }
+
+html[data-theme="dark"] .hero { background: #172b40; }
+html[data-theme="dark"] .hero-background-overlay { background: linear-gradient(90deg,rgba(23,43,64,.97) 0%,rgba(23,43,64,.91) 33%,rgba(23,43,64,.67) 54%,rgba(23,43,64,.22) 75%,rgba(23,43,64,.08) 100%); }
+html[data-theme="dark"] :is(.hero-text h1,.hero-text h1 span) { color: #f1f5f9; }
+html[data-theme="dark"] :is(.hero-text p,.hero-scroll-indicator) { color: #d2e0ea; }
+html[data-theme="dark"] :is(.hero-label,.hero-more-button) { background: #223b53; color: #f1f5f9; border-color: #3d5870; }

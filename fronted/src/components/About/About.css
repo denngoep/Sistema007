@@ -174,3 +174,8 @@
     transition: none;
   }
 }
+
+html[data-theme="dark"] .about { background: #172b40; }
+html[data-theme="dark"] :is(.about-heading h2,.about-value h3) { color: #f1f5f9; }
+html[data-theme="dark"] :is(.about-heading p,.about-value p) { color: #b8cadb; }
+html[data-theme="dark"] .about-value { background: #223b53; border-color: #3d5870; box-shadow: none; }

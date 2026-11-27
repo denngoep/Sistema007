@@ -172,3 +172,7 @@
     width: 100%;
   }
 }
+
+html[data-theme="dark"] .footer { background: #172b40; border-color: #3d5870; }
+html[data-theme="dark"] .footer-brand-name { color: #f1f5f9; }
+html[data-theme="dark"] :is(.footer-brand-info p,.footer-links a,.footer-bottom p) { color: #b8cadb; }

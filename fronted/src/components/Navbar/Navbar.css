@@ -278,3 +278,8 @@
     transition: none !important;
   }
 }
+
+html[data-theme="dark"] .navbar { background: #1e293b; border-color: #334155; box-shadow: none; }
+html[data-theme="dark"] .navbar-brand-name,html[data-theme="dark"] .navbar .menu-link { color: #f1f5f9; }
+html[data-theme="dark"] .navbar .menu-link:hover,html[data-theme="dark"] .navbar .menu-link.active { background: #253449; color: #f1f5f9; }
+html[data-theme="dark"] .navbar-toggle { background: #253449; color: #f1f5f9; border-color: #334155; }

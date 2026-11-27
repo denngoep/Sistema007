@@ -12,6 +12,7 @@ import {
 
 import "./Navbar.css";
 import logoSistema007 from "../../assets/logo-sistema007.png";
+import ThemeToggle from "../ThemeToggle";
 
 const menuItems = [
   { label: "Inicio", hash: "", Icon: House },
@@ -112,6 +113,7 @@ function Navbar() {
       </nav>
 
       <div className="navbar-actions">
+        <ThemeToggle />
         <button
           type="button"
           className="btn-login"

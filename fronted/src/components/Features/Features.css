@@ -331,3 +331,8 @@
     transition: none;
   }
 }
+
+html[data-theme="dark"] .features { background: #1b3148; }
+html[data-theme="dark"] :is(.features-header h2,.feature-card h3) { color: #f1f5f9; }
+html[data-theme="dark"] :is(.features-header p,.feature-card p) { color: #b8cadb; }
+html[data-theme="dark"] .feature-card { background: #223b53; border-color: #3d5870; box-shadow: none; }
