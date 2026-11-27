@@ -1,3 +1,4 @@
+import { useUserManagement } from '../components/user-management-context';
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,11 +9,13 @@ import type { UserRole } from "../services/users.service";
 import "../styles/CreateUser.css";
 
 function CreateUser() {
+  const permissions = useUserManagement();
   const navigate = useNavigate();
 
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
+  const [servicioId, setServicioId] = useState("");
   const [rol, setRol] = useState<UserRole | "">("");
 
   const [message, setMessage] = useState("");
@@ -21,11 +24,12 @@ function CreateUser() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (loading) return;
 
     setMessage("");
     setError("");
 
-    if (!rol) {
+    if (!rol || !permissions.allowedRoles.includes(rol)) {
       setError("Debes seleccionar un rol");
       return;
     }
@@ -38,6 +42,7 @@ function CreateUser() {
         correo,
         password,
         rol,
+        ...(permissions.isAdmin && servicioId ? { servicioId: Number(servicioId) } : {}),
       });
 
       setMessage(response.message);
@@ -46,6 +51,7 @@ function CreateUser() {
       setCorreo("");
       setPassword("");
       setRol("");
+      setServicioId("");
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -82,6 +88,13 @@ function CreateUser() {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {permissions.isAdmin ? <div className="create-user-field">
+              <label htmlFor="servicio">Servicio principal</label>
+              <select id="servicio" value={servicioId} onChange={event => setServicioId(event.target.value)}>
+                <option value="">Sin asignar</option>
+                {permissions.services.map(service => <option key={service.id} value={service.id}>{service.nombre}</option>)}
+              </select>
+            </div> : <p>Servicio: {permissions.servicio?.nombre}</p>}
             <div className="create-user-field">
               <label htmlFor="nombre">Nombre completo</label>
 
@@ -120,20 +133,7 @@ function CreateUser() {
                 required
               >
                 <option value="">Selecciona un rol</option>
-                <option value="ADMINISTRADOR">Administrador</option>
-                <option value="MEDICO">Médico</option>
-                <option value="ENFERMERO">Enfermero/a</option>
-                <option value="AUXILIAR_ENFERMERIA">
-                  Auxiliar de Enfermería
-                </option>
-                <option value="RECEPCION_ADMISIONES">
-                  Recepción / Admisiones
-                </option>
-                <option value="REGENTE_FARMACIA">Regente de Farmacia</option>
-                <option value="AUXILIAR_FARMACIA">Auxiliar de Farmacia</option>
-                <option value="QUIMICO_FARMACEUTICO">
-                  Químico Farmacéutico
-                </option>
+                {permissions.allowedRoles.map(role => <option key={role} value={role}>{role.replaceAll('_', ' ')}</option>)}
               </select>
             </div>
 

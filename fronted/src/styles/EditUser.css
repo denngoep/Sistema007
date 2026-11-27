@@ -97,6 +97,65 @@
   box-shadow: 0 0 0 3px rgba(0, 174, 188, 0.1);
 }
 
+.edit-user-field input[readonly] {
+  background: #f4f7fa;
+  color: #66788a;
+}
+
+.edit-user-field input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+
+.edit-user-scope {
+  margin: 0 0 24px;
+  padding: 20px;
+  border: 1px solid #cfe4e8;
+  border-radius: 12px;
+  background: #f4fbfc;
+}
+
+.edit-user-scope__field {
+  margin-bottom: 0;
+}
+
+.edit-user-scope__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 14px;
+  color: #29465f;
+  font-weight: 650;
+}
+
+.edit-user-scope p {
+  margin: 10px 0 16px;
+  color: #526f85;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.edit-user-scope__submit {
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #062b55;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.edit-user-scope__submit:hover:not(:disabled) {
+  background: #08427f;
+}
+
+.edit-user-scope__submit:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+}
+
 .edit-user-success,
 .edit-user-error {
   margin-top: 8px;
@@ -154,6 +213,18 @@
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+/* Alcance administrativo: superficie propia, no hereda los tonos claros. */
+html[data-theme="dark"] .edit-user-page { background: var(--s007-page); color: var(--s007-text); }
+html[data-theme="dark"] .edit-user-card { background: var(--s007-surface); box-shadow: none; }
+html[data-theme="dark"] :is(.edit-user-card h2,.edit-user-field label,.edit-user-scope__checkbox) { color: var(--s007-heading); }
+html[data-theme="dark"] :is(.edit-user-card-title p,.edit-user-scope p) { color: var(--s007-muted); }
+html[data-theme="dark"] .edit-user-scope { background: var(--s007-header); border-color: var(--s007-border); }
+html[data-theme="dark"] :is(.edit-user-field input,.edit-user-field select) { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
+html[data-theme="dark"] .edit-user-field input[readonly] { background: #243c52; color: var(--s007-muted); }
+html[data-theme="dark"] .edit-user-scope__checkbox input { accent-color: #00aebc; }
+html[data-theme="dark"] .edit-user-scope__submit { background: #007d88; color: #fff; }
+html[data-theme="dark"] .edit-user-scope__submit:hover:not(:disabled) { background: #0096a2; }
 
 @media (max-width: 650px) {
   .edit-user-header {

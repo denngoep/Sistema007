@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getUsers, updateUserStatus } from "../services/users.service";
+import { searchUsers, updateUserStatus, UserRequestError } from "../services/users.service";
 
 import type { User, UserRole } from "../services/users.service";
 
 import "../styles/Users.css";
+import { useUserManagement } from '../components/user-management-context';
 
 function Users() {
+  const permissions = useUserManagement();
   const navigate = useNavigate();
 
   const [users, setUsers] = useState<User[]>([]);
   const [message, setMessage] = useState("Cargando usuarios...");
   const [statusMessage, setStatusMessage] = useState("");
   const [updatingUserId, setUpdatingUserId] = useState<number | null>(null);
+  const [search, setSearch] = useState(""); const [rol, setRol] = useState(""); const [estado, setEstado] = useState("");
+  const [page, setPage] = useState(1); const [limit, setLimit] = useState(10); const [total, setTotal] = useState(0); const [totalPages, setTotalPages] = useState(0);
+  const [reload, setReload] = useState(0);
 
   const getRoleName = (rol: UserRole) => {
     const roles: Record<UserRole, string> = {
@@ -30,24 +35,15 @@ function Users() {
     return roles[rol];
   };
 
-  const loadUsers = async () => {
-    try {
-      const data = await getUsers();
-
-      setUsers(data);
-      setMessage("");
-    } catch (error) {
-      if (error instanceof Error) {
-        setMessage(error.message);
-      } else {
-        setMessage("No fue posible consultar los usuarios");
-      }
-    }
-  };
-
   useEffect(() => {
-    loadUsers();
-  }, []);
+    let active = true;
+    searchUsers({ search, rol, estado, page, limit }).then(data => {
+      if (active) { setUsers(data.users); setTotal(data.total); setTotalPages(data.totalPages); setMessage(""); }
+    }).catch(error => {
+      if (active) setMessage(error instanceof Error ? error.message : "No fue posible consultar los usuarios");
+    });
+    return () => { active = false; };
+  }, [search, rol, estado, page, limit, reload]);
 
   const handleStatusChange = async (user: User) => {
     const newStatus = !user.activo;
@@ -70,7 +66,11 @@ function Users() {
       );
 
       setStatusMessage(response.message);
+      setReload((value) => value + 1);
     } catch (error) {
+      if (error instanceof UserRequestError && error.status === 404) {
+        setUsers(current => current.filter(item => item.id !== user.id));
+      }
       if (error instanceof Error) {
         setStatusMessage(error.message);
       } else {
@@ -104,7 +104,7 @@ function Users() {
             <h2>Usuarios registrados</h2>
 
             <span>
-              {users.length}{" "}
+              {total}{" "}
               {users.length === 1
                 ? "usuario encontrado"
                 : "usuarios encontrados"}
@@ -120,19 +120,25 @@ function Users() {
           </button>
         </div>
 
+        <div className="users-filters"><input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Buscar nombre o correo" /><select value={rol} onChange={(e) => { setRol(e.target.value); setPage(1); }}><option value="">Todos los roles</option>{Object.entries({ ADMINISTRADOR: "Administrador", MEDICO: "Médico", ENFERMERO: "Enfermero/a", AUXILIAR_ENFERMERIA: "Auxiliar de Enfermería", RECEPCION_ADMISIONES: "Recepción / Admisiones", REGENTE_FARMACIA: "Regente de Farmacia", AUXILIAR_FARMACIA: "Auxiliar de Farmacia", QUIMICO_FARMACEUTICO: "Químico Farmacéutico" }).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><select value={estado} onChange={(e) => { setEstado(e.target.value); setPage(1); }}><option value="">Todos los estados</option><option value="ACTIVO">Activos</option><option value="INACTIVO">Inactivos</option></select><select value={limit} onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }}><option value={10}>10 por página</option><option value={20}>20 por página</option><option value={50}>50 por página</option></select></div>
+
         {message && <div className="users-message">{message}</div>}
 
         {statusMessage && <div className="users-message">{statusMessage}</div>}
+        {!message && users.length === 0 && <p className="users-message" role="status">
+          {permissions.isAdmin ? "No hay usuarios registrados para mostrar." : `No hay usuarios ordinarios que puedas administrar en ${permissions.servicio?.nombre ?? 'tu servicio'}. Puedes registrar un nuevo usuario con los roles autorizados.`}
+        </p>}
 
         {!message && users.length > 0 && (
           <div className="users-table-container">
             <table className="users-table">
               <thead>
                 <tr>
-                  <th>IDENTIFICACIÓN</th>
+                  <th>ID</th>
                   <th>Nombre</th>
                   <th>Correo</th>
                   <th>Rol</th>
+                  <th>Servicio / Coordinación</th>
                   <th>Estado</th>
                   <th>Intentos fallidos</th>
                   <th>Acciones</th>
@@ -155,6 +161,8 @@ function Users() {
                         {getRoleName(user.rol)}
                       </span>
                     </td>
+
+                    <td>{user.servicio?.nombre ?? "Sin asignar"}{user.esCoordinador ? " · Coordinador" : ""}</td>
 
                     <td>
                       <span
@@ -204,6 +212,7 @@ function Users() {
             </table>
           </div>
         )}
+        {!message && totalPages > 0 && <div className="table-pagination"><button disabled={page <= 1} onClick={() => setPage(page - 1)}>Anterior</button><span>Página {page} de {totalPages}</span><button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Siguiente</button></div>}
       </section>
     </main>
   );
