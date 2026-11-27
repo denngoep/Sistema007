@@ -1,0 +1,73 @@
+/* El formulario conserva estilos inline por compatibilidad. Estas reglas se
+ * limitan a Traslados y reemplazan únicamente sus colores fijos en tema oscuro. */
+html[data-theme="dark"] .inventory-transfers {
+  background: var(--s007-surface) !important;
+  border-color: var(--s007-border) !important;
+  color: var(--s007-text);
+}
+
+html[data-theme="dark"] .inventory-transfers :is(h2, h3, strong, label) {
+  color: var(--s007-heading) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers p,
+html[data-theme="dark"] .inventory-transfers td {
+  color: var(--s007-text) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers form > div[style*="background"],
+html[data-theme="dark"] .inventory-transfers div[style*="background"] {
+  background: var(--s007-header) !important;
+  border-color: var(--s007-border) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers :is(input, select, textarea) {
+  background: var(--s007-control) !important;
+  color: var(--s007-heading) !important;
+  border-color: var(--s007-border) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers :is(input, textarea)::placeholder {
+  color: var(--s007-muted) !important;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .inventory-transfers :is(input, select, textarea):disabled {
+  background: #243c52 !important;
+  color: var(--s007-muted) !important;
+  opacity: .8;
+}
+
+html[data-theme="dark"] .inventory-transfers th {
+  background: var(--s007-table-header) !important;
+  border-color: var(--s007-border) !important;
+  color: var(--s007-heading) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers td {
+  border-color: var(--s007-border) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers button {
+  border-color: var(--s007-border) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers button[aria-pressed="false"] {
+  background: var(--s007-control) !important;
+  color: var(--s007-heading) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers button[aria-pressed="true"] {
+  background: #006f7a !important;
+  color: #fff !important;
+  border-color: var(--s007-accent, #00aebc) !important;
+}
+
+html[data-theme="dark"] .inventory-transfers [style*="dashed"] {
+  border-color: var(--s007-border) !important;
+  color: var(--s007-muted) !important;
+}
+
+@media (max-width: 640px) {
+  .inventory-transfers { padding: 18px !important; }
+}

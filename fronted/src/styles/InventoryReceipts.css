@@ -1,0 +1,589 @@
+/* ==========================================
+   SISTEMA 007
+   SEGUIMIENTO DE RECEPCIONES
+   ========================================== */
+
+/* CONTENEDOR PRINCIPAL */
+
+.inventory-content.inventory-receipts {
+  width: 100%;
+  max-width: 1500px;
+  margin: 24px auto;
+  padding: 22px;
+  box-sizing: border-box;
+  border: 1px solid #e1e8ed;
+  border-radius: 13px;
+  background: #ffffff;
+  color: #062b55;
+  font: inherit;
+}
+
+/* ENCABEZADOS Y FILTROS */
+
+.inventory-content.inventory-receipts .inventory-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.inventory-receipts .inventory-toolbar h2 {
+  margin: 0;
+  color: #062b55;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.inventory-receipts .inventory-toolbar p {
+  margin: 5px 0 0;
+  color: #82919d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.inventory-receipts .inventory-toolbar button {
+  min-height: 36px;
+  padding: 7px 13px;
+  border: 1px solid #d6e1e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #062b55;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inventory-receipts .inventory-toolbar button:hover:not(:disabled) {
+  border-color: #00aebc;
+  background: #f0fafb;
+}
+
+.inventory-receipts button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* TARJETAS DE INDICADORES */
+
+.inventory-content.inventory-receipts .inventory-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+  max-width: none;
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.inventory-content.inventory-receipts .inventory-overview > button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+  min-height: 96px;
+  padding: 16px 18px;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  background: #ffffff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.inventory-content.inventory-receipts .inventory-overview > button:hover,
+.inventory-content.inventory-receipts .inventory-overview > button[aria-pressed="true"] {
+  border-color: #8bd7dd;
+  box-shadow: 0 5px 14px rgba(6, 43, 85, 0.07);
+}
+
+.inventory-receipts .inventory-overview > button::before {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 3px;
+  margin-bottom: 3px;
+  border-radius: 6px;
+  background: #062b55;
+}
+
+.inventory-receipts .inventory-overview > button:nth-child(2)::before {
+  background: #d49b25;
+}
+
+.inventory-receipts .inventory-overview > button:nth-child(3)::before {
+  background: #249b69;
+}
+
+.inventory-receipts .inventory-overview > button:nth-child(4)::before {
+  background: #d65a58;
+}
+
+.inventory-receipts .inventory-overview strong {
+  display: block;
+  margin: 0;
+  color: #062b55;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.inventory-receipts .inventory-overview span {
+  display: block;
+  color: #657b8a;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* BUSCADOR Y SELECTOR */
+
+.inventory-receipts .inventory-toolbar input[type="search"],
+.inventory-receipts .inventory-toolbar select {
+  box-sizing: border-box;
+  min-height: 38px;
+  height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #d6e1e8;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #17324d;
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.inventory-receipts .inventory-toolbar input[type="search"] {
+  flex: 1 1 280px;
+  width: 100%;
+  max-width: 390px;
+  min-width: 0;
+}
+
+.inventory-receipts .inventory-toolbar select {
+  flex: 0 1 250px;
+  width: 100%;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.inventory-receipts .inventory-toolbar input:focus,
+.inventory-receipts .inventory-toolbar select:focus {
+  border-color: #00aebc;
+  box-shadow: 0 0 0 2px rgba(0, 174, 188, 0.12);
+}
+
+/* TABLA DE RECEPCIONES */
+
+.inventory-receipts .inventory-receipts-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.inventory-receipts .inventory-table {
+  width: 100%;
+  min-width: 1050px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.inventory-receipts .inventory-table th {
+  padding: 11px 10px;
+  border-bottom: 1px solid #dce6eb;
+  background: #f4f8fa;
+  color: #506a7c;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
+
+.inventory-receipts .inventory-table td {
+  padding: 11px 10px;
+  border-bottom: 1px solid #edf1f4;
+  color: #17324d;
+  font-size: 11px;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+.inventory-receipts .inventory-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.inventory-receipts .inventory-table tbody tr:hover {
+  background: #fbfcfd;
+}
+
+.inventory-receipts .inventory-table td:first-child {
+  max-width: 185px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.inventory-receipts .inventory-table td:nth-child(2) {
+  color: #062b55;
+  font-weight: 600;
+}
+
+.inventory-receipts .inventory-table td:nth-child(3) {
+  min-width: 160px;
+}
+
+.inventory-receipts .inventory-table td:nth-child(4) {
+  color: #657b8a;
+  white-space: nowrap;
+}
+
+.inventory-receipts .inventory-table th:nth-child(6),
+.inventory-receipts .inventory-table th:nth-child(7),
+.inventory-receipts .inventory-table th:nth-child(8),
+.inventory-receipts .inventory-table td:nth-child(6),
+.inventory-receipts .inventory-table td:nth-child(7),
+.inventory-receipts .inventory-table td:nth-child(8) {
+  text-align: center;
+}
+
+.inventory-receipts .inventory-table td:nth-child(6) {
+  color: #249b69;
+  font-weight: 700;
+}
+
+.inventory-receipts .inventory-table td:nth-child(7) {
+  color: #b7791f;
+  font-weight: 700;
+}
+
+.inventory-receipts .inventory-table td:nth-child(8) {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+/* BOTONES */
+
+.inventory-receipts .receipt-action,
+.inventory-receipts .receipt-secondary-button,
+.inventory-receipts .receipt-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 1px solid #d6e1e8;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #062b55;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.inventory-receipts .receipt-action:hover,
+.inventory-receipts .receipt-secondary-button:hover {
+  border-color: #00aebc;
+  background: #f0fafb;
+}
+
+.inventory-receipts .receipt-primary-button {
+  background: #062b55;
+  border-color: #062b55;
+  color: #ffffff;
+}
+
+.inventory-receipts .receipt-primary-button:hover {
+  background: #0b427a;
+}
+
+/* DETALLE DE RECEPCIÓN */
+
+.inventory-receipts .receipt-detail-panel {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #17324d;
+}
+
+.inventory-receipts .receipt-detail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.inventory-receipts .receipt-detail-heading h3 {
+  margin: 0;
+  color: #062b55;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.inventory-receipts .receipt-detail-heading p {
+  margin: 6px 0 0;
+  color: #657b8a;
+  font-size: 12px;
+}
+
+.inventory-receipts .receipt-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 18px;
+  margin-bottom: 20px;
+  border: 1px solid #e1e8ed;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.inventory-receipts .receipt-detail-meta span {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.inventory-receipts .receipt-detail-meta b {
+  color: #062b55;
+  margin-right: 5px;
+}
+
+/* TABLA DEL DETALLE */
+
+.inventory-receipts .receipt-detail-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e1e8ed;
+  border-radius: 10px;
+  margin-bottom: 22px;
+}
+
+.inventory-receipts .receipt-detail-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.inventory-receipts .receipt-detail-table th {
+  padding: 13px 12px;
+  background: #f4f8fa;
+  border-bottom: 1px solid #dce6eb;
+  color: #506a7c;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.inventory-receipts .receipt-detail-table td {
+  padding: 13px 12px;
+  border-bottom: 1px solid #edf1f4;
+  color: #17324d;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.inventory-receipts .receipt-reviewed {
+  color: #657b8a;
+  font-size: 11px;
+}
+
+/* FORMULARIO DE REVISIÓN */
+
+.inventory-receipts .receipt-review-form {
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #dce6eb;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.inventory-receipts .receipt-review-form h4 {
+  margin: 0 0 20px;
+  color: #062b55;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.inventory-receipts .receipt-review-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.inventory-receipts .receipt-review-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #506a7c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inventory-receipts .receipt-review-form input,
+.inventory-receipts .receipt-review-form select,
+.inventory-receipts .receipt-review-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 12px;
+  border: 1px solid #d6e1e8;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #17324d;
+  font: inherit;
+  font-size: 12px;
+}
+
+.inventory-receipts .receipt-review-form textarea {
+  min-height: 95px;
+  resize: vertical;
+}
+
+.inventory-receipts .receipt-review-form input:focus,
+.inventory-receipts .receipt-review-form select:focus,
+.inventory-receipts .receipt-review-form textarea:focus {
+  outline: none;
+  border-color: #00aebc;
+  box-shadow: 0 0 0 2px rgba(0, 174, 188, 0.12);
+}
+
+.inventory-receipts .receipt-review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* MENSAJES */
+
+.inventory-receipts > p {
+  margin: 12px 0;
+  padding: 14px 16px;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #657b8a;
+  font-size: 12px;
+}
+
+.inventory-receipts .receipt-error,
+.inventory-receipts .receipt-success {
+  padding: 12px 14px;
+  margin: 12px 0;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.inventory-receipts .receipt-error,
+.inventory-receipts > p[role="alert"] {
+  color: #b44938;
+  background: #fff5f3;
+  border-color: #edc9c5;
+}
+
+.inventory-receipts .receipt-success {
+  color: #176846;
+  background: #eaf8f1;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+  .inventory-content.inventory-receipts .inventory-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .inventory-content.inventory-receipts {
+    width: auto;
+    margin: 20px;
+    padding: 15px;
+  }
+
+  .inventory-content.inventory-receipts .inventory-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inventory-receipts .inventory-toolbar input[type="search"],
+  .inventory-receipts .inventory-toolbar select {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .inventory-receipts .receipt-detail-meta,
+  .inventory-receipts .receipt-review-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-receipts .receipt-detail-panel {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventory-content.inventory-receipts {
+    margin: 12px;
+  }
+
+  .inventory-content.inventory-receipts .inventory-overview {
+    grid-template-columns: 1fr;
+  }
+}
+
+html[data-theme="dark"] :is(.inventory-receipts,.inventory-receipts__filters,.inventory-receipts__table-wrap,.inventory-receipts__summary,.inventory-content.inventory-receipts) { background: #223b53; border-color: #3d5870; }
+html[data-theme="dark"] :is(.inventory-receipts h2,.inventory-receipts h3,.inventory-receipts strong) { color: #f1f5f9; }
+html[data-theme="dark"] :is(.inventory-receipts p,.inventory-receipts small,.inventory-receipts span) { color: #b8cadb; }
+html[data-theme="dark"] :is(.inventory-receipts input,.inventory-receipts select) { background: #29445e; color: #f1f5f9; border-color: #3d5870; }
+html[data-theme="dark"] .inventory-receipts table th { background: #2b465f; color: #f1f5f9; }
+
+/* Seguimiento y gestión de recepciones: reglas específicas, no globales. */
+html[data-theme="dark"] .inventory-content.inventory-receipts,
+html[data-theme="dark"] .inventory-receipts .inventory-toolbar,
+html[data-theme="dark"] .inventory-receipts .receipt-detail-panel,
+html[data-theme="dark"] .inventory-receipts .receipt-review-form { background: var(--s007-surface); border-color: var(--s007-border); }
+html[data-theme="dark"] .inventory-receipts .inventory-overview > button,
+html[data-theme="dark"] .inventory-receipts .inventory-overview > div { background: var(--s007-surface); border-color: var(--s007-border); box-shadow: none; }
+html[data-theme="dark"] .inventory-receipts .inventory-overview :is(strong,b) { color: var(--s007-heading); }
+html[data-theme="dark"] .inventory-receipts :is(h2,h3,h4,.receipt-detail-heading) { color: var(--s007-heading); }
+html[data-theme="dark"] .inventory-receipts :is(p,small,label,.receipt-detail-meta,.receipt-reviewed) { color: var(--s007-muted); }
+html[data-theme="dark"] .inventory-receipts :is(input,select,textarea) { background: var(--s007-control); color: var(--s007-heading); border-color: var(--s007-border); }
+html[data-theme="dark"] .inventory-receipts :is(input,textarea)::placeholder { color: var(--s007-muted); opacity: 1; }
+html[data-theme="dark"] .inventory-receipts :is(.inventory-receipts-table-wrap,.receipt-detail-table-wrap) { border-color: var(--s007-border); background: var(--s007-surface); }
+html[data-theme="dark"] .inventory-receipts :is(.inventory-table,.receipt-detail-table) :is(th,td) { border-color: var(--s007-border); }
+html[data-theme="dark"] .inventory-receipts :is(.inventory-table,.receipt-detail-table) th { background: var(--s007-table-header); color: var(--s007-heading); }
+html[data-theme="dark"] .inventory-receipts :is(.inventory-table,.receipt-detail-table) td { background: var(--s007-surface); color: var(--s007-text); }
+html[data-theme="dark"] .inventory-receipts :is(.receipt-action,.receipt-secondary-button) { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
+html[data-theme="dark"] .inventory-receipts .receipt-primary-button { background: #007d88; color: #fff; }
+html[data-theme="dark"] .inventory-receipts .inventory-toolbar button { background: var(--s007-control); border-color: var(--s007-border); color: var(--s007-heading); }
+html[data-theme="dark"] .inventory-receipts .inventory-toolbar button:hover:not(:disabled) { background: #31516d; border-color: #57cbd3; }
+html[data-theme="dark"] .inventory-receipts :is(.receipt-error,[role="alert"]) { background: #513440; border-color: #9d5a67; color: #ffd8dd; }
+html[data-theme="dark"] .inventory-receipts .receipt-success { background: #1d574d; border-color: #3a907e; color: #d6fff2; }
