@@ -3,6 +3,8 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { PatientsRepository } from '../repositories/patients.repository';
 import { CreatePatientDto } from '../dto/create-patient.dto';
 import { UpdatePatientDto } from '../dto/update-patient.dto';
+import { BadRequestException } from '@nestjs/common';
+import type { Prisma } from '../generated/prisma/client';
 
 @Injectable()
 export class PatientsService {
@@ -10,6 +12,44 @@ export class PatientsService {
 
   getPatients() {
     return this.patientsRepository.findAll();
+  }
+
+  async searchPatients(query: Record<string, string | undefined>) {
+    const page = Number(query.page ?? 1);
+    const limit = Number(query.limit ?? 10);
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      ![10, 20, 50].includes(limit)
+    )
+      throw new BadRequestException('Paginación no válida');
+    if (query.estado && !['ACTIVO', 'INACTIVO'].includes(query.estado))
+      throw new BadRequestException('Estado no válido');
+    const search = query.search?.trim();
+    const where: Prisma.PacienteWhereInput = {
+      ...(query.estado ? { activo: query.estado === 'ACTIVO' } : {}),
+      ...(search
+        ? {
+            OR: [
+              { nombres: { contains: search } },
+              { apellidos: { contains: search } },
+              { numeroDocumento: { contains: search } },
+            ],
+          }
+        : {}),
+    };
+    const [total, patients] = await this.patientsRepository.findPage(
+      where,
+      page,
+      limit,
+    );
+    return {
+      patients,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async updatePatient(id: number, updatePatientDto: UpdatePatientDto) {
