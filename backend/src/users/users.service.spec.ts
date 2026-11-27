@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '../services/users.service';
 import { UsersRepository } from '../repositories/users.repository';
 
+jest.mock('../prisma/prisma.service', () => ({ PrismaService: class {} }));
+
 describe('UsersService', () => {
   let service: UsersService;
 
