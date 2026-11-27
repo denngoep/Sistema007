@@ -34,7 +34,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (exception instanceof Error) {
       console.error('[HttpExceptionFilter] Unhandled error:', exception);
     } else {
-      console.error('[HttpExceptionFilter] Unhandled non-error exception:', exception);
+      console.error(
+        '[HttpExceptionFilter] Unhandled non-error exception:',
+        exception,
+      );
     }
 
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

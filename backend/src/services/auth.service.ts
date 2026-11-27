@@ -1,5 +1,5 @@
 import {
-  ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -10,7 +10,6 @@ import { OAuth2Client } from 'google-auth-library';
 import { randomInt } from 'node:crypto';
 
 import { AuthRepository } from '../repositories/auth.repository';
-import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { GoogleLoginDto } from '../dto/google-login.dto';
 import { MailService } from './mail.service';
@@ -26,27 +25,10 @@ export class AuthService {
   ) {}
 
   // REGISTRO DE USUARIOS
-  async register(registerDto: RegisterDto) {
-    const existingUser = await this.authRepository.findByEmail(
-      registerDto.email,
+  register(): never {
+    throw new ForbiddenException(
+      'El registro público está deshabilitado. Solicita el alta a un administrador.',
     );
-
-    if (existingUser) {
-      throw new ConflictException('El email ya se encuentra registrado');
-    }
-
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-
-    await this.authRepository.createUser({
-      nombre: registerDto.nombre,
-      correo: registerDto.email,
-      password: hashedPassword,
-    });
-
-    return {
-      success: true,
-      message: 'Usuario registrado correctamente',
-    };
   }
 
   // VERIFICACIÓN GOOGLE RECAPTCHA V2
@@ -162,6 +144,7 @@ export class AuthService {
         id: user.id,
         nombre: user.nombre,
         email: user.correo,
+        rol: user.rol,
         activo: user.activo,
       },
     };
@@ -182,8 +165,6 @@ export class AuthService {
     let googlePayload;
 
     try {
-      // Verificar que la credencial provenga de Google
-      // y corresponda a nuestro cliente OAuth.
       const ticket = await googleClient.verifyIdToken({
         idToken: googleLoginDto.credential,
         audience: clientId,
@@ -196,7 +177,6 @@ export class AuthService {
       );
     }
 
-    // Google debe proporcionar un correo verificado.
     if (
       !googlePayload?.sub ||
       !googlePayload.email ||
@@ -209,7 +189,6 @@ export class AuthService {
 
     const email = googlePayload.email.trim().toLowerCase();
 
-    // Solo permitir usuarios registrados en Sistema007.
     const user = await this.authRepository.findByEmail(email);
 
     if (!user) {
@@ -218,12 +197,10 @@ export class AuthService {
       );
     }
 
-    // Respetar el bloqueo y el estado del usuario.
     if (!user.activo) {
       throw new UnauthorizedException('Tu usuario está bloqueado o inactivo');
     }
 
-    // Generar el mismo tipo de JWT del login tradicional.
     const payload = {
       sub: user.id,
       email: user.correo,
@@ -240,6 +217,7 @@ export class AuthService {
         id: user.id,
         nombre: user.nombre,
         email: user.correo,
+        rol: user.rol,
         activo: user.activo,
       },
     };

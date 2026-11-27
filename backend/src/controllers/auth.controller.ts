@@ -1,6 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { GoogleLoginDto } from '../dto/google-login.dto';
 import { RequestPasswordRecoveryDto } from '../dto/request-password-recovery.dto';
@@ -12,8 +11,8 @@ export class AuthController {
 
   // REGISTRO DE USUARIOS
   @Post('register')
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  register() {
+    return this.authService.register();
   }
 
   // INICIO DE SESIÓN CON CORREO Y CONTRASEÑA
