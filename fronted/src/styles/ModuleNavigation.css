@@ -1,0 +1,212 @@
+.module-layout { --s007-navy: #062b55; --s007-turquoise: #00aebc; --s007-text: #17324d; --s007-muted: #718399; --s007-border: #e2eaf1; display: flex; min-height: 100vh; background: #f5f8fb; color: var(--s007-text); }
+.module-navigation { position: fixed; inset: 0 auto 0 0; z-index: 30; display: flex; flex-direction: column; width: 232px; background: var(--s007-navy); color: #fff; transition: width .22s ease; }
+.module-layout--collapsed .module-navigation { width: 74px; }
+.module-navigation__brand { display: flex; align-items: center; gap: 9px; min-height: 64px; padding: 0 14px; border-bottom: 1px solid rgba(255,255,255,.12); overflow: hidden; white-space: nowrap; }
+.module-navigation__mark { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; border-radius: 9px; background: var(--s007-turquoise); color: #fff; font-size: 19px; font-weight: 800; }
+.module-navigation__brand strong { display: block; font-size: 17px; font-weight: 750; letter-spacing: -.4px; }.module-navigation__brand strong span { color: #50dce3; }.module-navigation__brand small { display: block; margin-top: 2px; color: #cfe0ec; font-size: 11px; }
+.module-navigation__menu { flex: 1; min-height: 0; padding: 18px 11px; overflow-y: auto; }.module-navigation__link,.module-navigation__group-toggle,.module-navigation__logout { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 45px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: #d5e5ef; font: inherit; font-size: 15px; font-weight: 650; text-align: left; text-decoration: none; cursor: pointer; }
+.module-navigation__link:hover,.module-navigation__group-toggle:hover,.module-navigation__logout:hover,.module-navigation__link.active,.module-navigation__group.active-group>.module-navigation__group-toggle { background: rgba(255,255,255,.09); color: #fff; }.module-navigation__link.active,.module-navigation__group.active-group>.module-navigation__group-toggle { box-shadow: inset 3px 0 0 var(--s007-turquoise); background: rgba(0,174,188,.2); }
+.module-navigation__icon { display: grid; place-items: center; flex: 0 0 25px; width: 25px; height: 25px; color: #bfecef; font-size: 14px; font-weight: 800; }.module-navigation__chevron { margin-left: auto; color: #9fc3d5; font-size: 17px; transition: transform .2s ease; }.module-navigation__group-toggle[aria-expanded="true"] .module-navigation__chevron { transform: rotate(180deg); }
+.module-navigation__subitems { display: grid; gap: 2px; margin: 3px 0 7px 37px; border-left: 1px solid rgba(184,207,223,.4); }.module-navigation__sublink { padding: 8px 12px; color: #cfe0ec; font-size: 14px; font-weight: 550; text-decoration: none; }.module-navigation__sublink:hover,.module-navigation__sublink.active { color: #fff; }.module-navigation__sublink.active { color: #5ce2e7; font-weight: 750; }
+.module-navigation__logout { flex: 0 0 auto; margin: 0 11px 16px; width: calc(100% - 22px); border-top: 1px solid rgba(255,255,255,.12); border-radius: 0; padding-top: 14px; }.module-layout--collapsed .module-navigation__brand,.module-layout--collapsed .module-navigation__link,.module-layout--collapsed .module-navigation__group-toggle,.module-layout--collapsed .module-navigation__logout { justify-content: center; padding-right: 0; padding-left: 0; }.module-layout--collapsed .module-navigation__logout { width: calc(100% - 18px); margin-inline: 9px; }.module-layout--collapsed .module-navigation__menu { padding-inline: 9px; }
+.module-workspace { width: calc(100% - 232px); min-width: 0; min-height: 100vh; margin-left: 232px; transition: width .22s ease, margin-left .22s ease; }.module-layout--collapsed .module-workspace { width: calc(100% - 74px); margin-left: 74px; }.module-workspace__header { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 66px; padding: 0 24px; border-bottom: 1px solid var(--s007-border); background: #fff; }.module-workspace__heading,.module-workspace__user { display: flex; align-items: center; gap: 12px; min-width: 0; }.module-workspace__toggle { display: grid; place-items: center; flex: 0 0 auto; width: 36px; height: 36px; border: 1px solid #dce6ee; border-radius: 9px; background: #fff; color: var(--s007-navy); font-size: 19px; cursor: pointer; }.module-workspace__toggle:hover { background: #f0f7fa; border-color: #c3dbe4; }.module-workspace__heading h1 { margin: 0; color: var(--s007-navy); font-size: 18px; font-weight: 750; line-height: 1.2; }.module-workspace__heading p { margin: 4px 0 0; color: var(--s007-muted); font-size: 11px; }.module-workspace__user>span { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #e5f7f8; color: #008996; font-size: 15px; font-weight: 800; }.module-workspace__user strong,.module-workspace__user small { display: block; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.module-workspace__user strong { color: var(--s007-text); font-size: 13px; }.module-workspace__user small { margin-top: 3px; color: var(--s007-muted); font-size: 11px; }.module-workspace__content { width: 100%; max-width: 1440px; margin: 0 auto; padding: 20px 24px 24px; }
+.module-workspace__content .users-back-button,.module-workspace__content .patients-back-button,.module-workspace__content .clinical-histories-back-button,.module-workspace__content .clinical-history-back,.module-workspace__content .create-patient-back,.module-workspace__content .edit-patient-back,.module-workspace__content .create-user-back,.module-workspace__content .edit-user-back,.module-workspace__content .inventory-back-button,.module-workspace__content .reports-back { display: none; }
+.module-workspace__content .users-page,.module-workspace__content .patients-page,.module-workspace__content .clinical-histories-page,.module-workspace__content .clinical-history-page,.module-workspace__content .inventory-page,.module-workspace__content .reports-page,.module-workspace__content .create-user-page,.module-workspace__content .edit-user-page,.module-workspace__content .create-patient-page,.module-workspace__content .edit-patient-page,.module-workspace__content .s007-receipt-page { width: 100%; max-width: none; min-height: 0; margin: 0; padding: 0; background: transparent; }
+.module-workspace__content .users-header,.module-workspace__content .patients-header,.module-workspace__content .clinical-histories-header,.module-workspace__content .clinical-history-header,.module-workspace__content .inventory-page>.inventory-header,.module-workspace__content .reports-header,.module-workspace__content .create-user-header,.module-workspace__content .edit-user-header,.module-workspace__content .create-patient-header,.module-workspace__content .edit-patient-header,.module-workspace__content .s007-receipt-header { display: none; }
+@media (max-width: 760px) { .module-navigation,.module-layout--collapsed .module-navigation { width: 64px; }.module-workspace,.module-layout--collapsed .module-workspace { width: calc(100% - 64px); margin-left: 64px; }.module-navigation__brand { justify-content: center; padding: 0; }.module-navigation__menu { padding: 14px 7px; }.module-navigation__link,.module-navigation__group-toggle,.module-navigation__logout { justify-content: center; padding-inline: 0; }.module-navigation__logout { width: calc(100% - 14px); margin-inline: 7px; }.module-navigation__subitems { display: none; }.module-workspace__header { height: 64px; padding: 0 16px; }.module-workspace__user>div { display: none; }.module-workspace__content { padding: 16px; }.module-workspace__heading p { max-width: 155px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+@media (prefers-reduced-motion: reduce) { .module-navigation,.module-workspace,.module-navigation__chevron { transition: none; } }
+
+/* Menú compacto: conserva el desplazamiento, pero evita una barra visual invasiva. */
+.module-navigation__menu { padding-top: 10px; padding-bottom: 10px; scrollbar-width: none; -ms-overflow-style: none; }
+.module-navigation__menu::-webkit-scrollbar { width: 0; height: 0; }
+.module-navigation__link,.module-navigation__group-toggle { min-height: 42px; }
+.module-navigation__icon { flex-basis: 28px; width: 28px; height: 28px; }
+.module-navigation__sublink { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.theme-toggle { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid #dce6ee; border-radius: 9px; background: #fff; color: #062b55; cursor: pointer; }
+.theme-toggle:hover { border-color: #00aebc; background: #edfafa; }
+html[data-theme="dark"] .module-workspace__header,.module-workspace { background: var(--s007-page); }
+html[data-theme="dark"] .module-workspace__header,.theme-toggle { border-color: var(--s007-border); }
+html[data-theme="dark"] .module-workspace__header,.theme-toggle { background: var(--s007-surface); color: var(--s007-text); }
+
+/* Espaciado deliberado: la navegación conserva aire y recurre a scroll oculto
+   cuando la altura disponible no basta. */
+.module-navigation__menu { padding-top: 16px; padding-bottom: 16px; }
+.module-navigation__menu { display: flex; flex-direction: column; gap: 12px; padding-top: 14px; }
+.module-navigation__subitems { margin-bottom: 0; }
+.module-navigation__link,.module-navigation__group-toggle { min-height: 48px; gap: 10px; padding-inline: 10px; }
+.module-navigation__group-toggle > span:not(.module-navigation__icon) { min-width: 0; white-space: nowrap; }
+.module-navigation__icon { flex-basis: 28px; width: 28px; height: 28px; }
+.module-navigation__subitems { margin-top: 5px; margin-bottom: 10px; gap: 4px; }
+.module-navigation__sublink { padding-block: 9px; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.35; }
+html[data-theme="dark"] .module-layout { --s007-text: #f1f5f9; --s007-muted: #b8cadb; --s007-border: #527087; background: var(--s007-page); }
+html[data-theme="dark"] .module-workspace__header { background: var(--s007-header); border-color: var(--s007-border); }
+html[data-theme="dark"] .module-workspace__heading h1,html[data-theme="dark"] .module-workspace__user strong { color: #f1f5f9; }
+html[data-theme="dark"] .module-workspace__heading p,html[data-theme="dark"] .module-workspace__user small { color: var(--s007-muted); }
+html[data-theme="dark"] .module-workspace__toggle,html[data-theme="dark"] .theme-toggle { background: var(--s007-control); color: #f1f5f9; border-color: var(--s007-border); }
+html[data-theme="dark"] .module-workspace__content :is(.users-back-button,.patients-back-button,.clinical-histories-back-button,.clinical-history-back,.create-patient-back,.edit-patient-back,.create-user-back,.edit-user-back,.inventory-back-button,.reports-back) { background: var(--s007-control); color: #f1f5f9; border-color: var(--s007-border); }
+
+/* Legibilidad compartida sin alterar los componentes funcionales de cada módulo. */
+.module-workspace__heading h1 { font-size: 20px; line-height: 1.25; }
+.module-workspace__heading p { color: #526f85; font-size: 14px; }
+.module-workspace__user strong { font-size: 15px; }
+.module-workspace__user small { color: #526f85; font-size: 13px; }
+.module-workspace__content { padding: 16px 20px 22px; }
+.module-workspace__content input,.module-workspace__content select,.module-workspace__content textarea { font-size: 14px; line-height: 1.4; }
+.module-workspace__content label { color: #29465f; font-size: 13px; font-weight: 650; line-height: 1.4; }
+.module-workspace__content table th { font-size: 12px; line-height: 1.35; }
+.module-workspace__content table td { font-size: 14px; line-height: 1.4; }
+.module-workspace__content table td small { font-size: 12px; line-height: 1.35; }
+.module-workspace__content button { font-weight: 650; }
+.module-workspace__supervision { width: auto !important; height: auto !important; padding: 5px 8px; border: 1px solid #9ad9de; border-radius: 999px !important; background: #eefafb !important; color: #007d87 !important; font-size: 12px !important; font-weight: 800 !important; white-space: nowrap; }
+
+/* Los encabezados locales conservan únicamente su acción de regreso: el
+   título ya está disponible en el encabezado compartido del módulo. */
+.module-workspace__content .users-header,
+.module-workspace__content .patients-header,
+.module-workspace__content .clinical-histories-header,
+.module-workspace__content .clinical-history-header,
+.module-workspace__content .inventory-page > .inventory-header,
+.module-workspace__content .reports-header,
+.module-workspace__content .create-user-header,
+.module-workspace__content .edit-user-header,
+.module-workspace__content .create-patient-header,
+.module-workspace__content .edit-patient-header,
+.module-workspace__content .s007-receipt-header {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 0;
+  margin: 0 0 12px;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.module-workspace__content .users-header > div:first-child,
+.module-workspace__content .patients-header > div:first-child,
+.module-workspace__content .clinical-histories-header > div:first-child,
+.module-workspace__content .clinical-history-header > div:first-child,
+.module-workspace__content .inventory-page > .inventory-header > div:first-child,
+.module-workspace__content .reports-header > div:first-child,
+.module-workspace__content .create-user-header > div:first-child,
+.module-workspace__content .edit-user-header > div:first-child,
+.module-workspace__content .create-patient-header > div:first-child,
+.module-workspace__content .edit-patient-header > div:first-child,
+.module-workspace__content .s007-receipt-header > div:first-child {
+  display: none;
+}
+
+.module-workspace__content .users-back-button,
+.module-workspace__content .patients-back-button,
+.module-workspace__content .clinical-histories-back-button,
+.module-workspace__content .clinical-history-back,
+.module-workspace__content .create-patient-back,
+.module-workspace__content .edit-patient-back,
+.module-workspace__content .create-user-back,
+.module-workspace__content .edit-user-back,
+.module-workspace__content .inventory-back-button,
+.module-workspace__content .reports-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid #c7d8e4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #062b55;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.module-workspace__content .users-back-button:hover,
+.module-workspace__content .patients-back-button:hover,
+.module-workspace__content .clinical-histories-back-button:hover,
+.module-workspace__content .clinical-history-back:hover,
+.module-workspace__content .create-patient-back:hover,
+.module-workspace__content .edit-patient-back:hover,
+.module-workspace__content .create-user-back:hover,
+.module-workspace__content .edit-user-back:hover,
+.module-workspace__content .inventory-back-button:hover,
+.module-workspace__content .reports-back:hover {
+  border-color: #00aebc;
+  background: #edfafa;
+}
+
+/* En teléfonos la barra sigue compacta, pero los submódulos abiertos se
+   muestran como un panel navegable. Antes se ocultaban por completo. */
+@media (max-width: 760px) {
+  .module-navigation__brand > span:not(.module-navigation__mark) {
+    display: none;
+  }
+
+  .module-navigation__menu {
+    padding: 10px 7px;
+    gap: 8px;
+  }
+
+  .module-navigation__link,
+  .module-navigation__group-toggle,
+  .module-navigation__logout {
+    min-height: 44px;
+    font-size: 0;
+  }
+
+  .module-navigation__subitems {
+    position: fixed;
+    top: 64px;
+    right: 0;
+    bottom: 0;
+    left: 64px;
+    z-index: 35;
+    display: grid;
+    align-content: start;
+    gap: 4px;
+    width: auto;
+    margin: 0;
+    padding: 14px 12px 24px;
+    overflow-y: auto;
+    border-left: 1px solid rgba(184, 207, 223, 0.35);
+    background: #062b55;
+    box-shadow: 12px 0 28px rgba(3, 22, 41, 0.24);
+  }
+
+  .module-navigation__sublink {
+    min-height: 42px;
+    padding: 11px 12px;
+    white-space: normal;
+    overflow: visible;
+    line-height: 1.35;
+  }
+
+  .module-workspace__header {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  .module-workspace__heading h1 {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 390px) {
+  .module-navigation,
+  .module-layout--collapsed .module-navigation {
+    width: 58px;
+  }
+
+  .module-workspace,
+  .module-layout--collapsed .module-workspace {
+    width: calc(100% - 58px);
+    margin-left: 58px;
+  }
+
+  .module-navigation__subitems {
+    left: 58px;
+  }
+
+  .module-workspace__heading p {
+    display: none;
+  }
+}
