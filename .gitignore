@@ -1,2 +1,22 @@
 
 /node_modules/
+
+# Local IDE and API-client workspaces.
+/.postman/
+/postman/
+/.vscode/
+
+# Local operational artifacts. Prisma migration SQL files remain versioned.
+/respaldos/
+/backend/respaldo_*.sql
+/backend/sistema007_respaldo.sql
+/backend/*.tsbuildinfo
+/backend/agregar_bodega_destino.sql
+/backend/cambios_pendientes.sql
+/backend/diferencias_sistema007.sql
+/backend/prisma/cambios_pendientes.sql
+/backend/prisma/gestion_no_conformes.sql
+/backend/src/repositories/*.respaldo.txt
+/backend/verificar-codigos.ts
+*.bak
+*.bak-*
