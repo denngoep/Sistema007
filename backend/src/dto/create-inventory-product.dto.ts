@@ -1,16 +1,19 @@
 import {
-  IsDateString,
   IsEnum,
-  IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
+  Max,
   Min,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TipoProductoInventario } from '../generated/prisma/client';
+import {
+  CondicionConservacion,
+  TipoProductoInventario,
+} from '../generated/prisma/client';
 
 export class CreateMedicationDataDto {
   @IsString()
@@ -25,22 +28,9 @@ export class CreateMedicationDataDto {
   @IsNotEmpty()
   formaFarmaceutica!: string;
 
-  @IsString()
   @IsOptional()
-  viaAdministracion?: string;
-}
-
-export class CreateInventoryBatchDto {
   @IsString()
-  @IsNotEmpty()
-  numeroLote!: string;
-
-  @IsDateString()
-  fechaVencimiento!: string;
-
-  @IsInt()
-  @Min(0)
-  cantidad!: number;
+  viaAdministracion?: string;
 }
 
 export class CreateInventoryProductDto {
@@ -59,19 +49,40 @@ export class CreateInventoryProductDto {
   @IsNotEmpty()
   descripcion!: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   marca?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   laboratorio?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   registroInvima?: string;
 
-  @ValidateNested()
-  @Type(() => CreateInventoryBatchDto)
-  lote!: CreateInventoryBatchDto;
+  @IsOptional()
+  @IsEnum(CondicionConservacion)
+  condicionConservacion?: CondicionConservacion;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  temperaturaMinima?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  temperaturaMaxima?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  humedadMaxima?: number;
+
+  @IsOptional()
+  @IsString()
+  claseRiesgo?: string;
 }
